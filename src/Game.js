@@ -54,7 +54,7 @@ var GameLayer = cc.Layer.extend({
 		
 		this.addKey();
 		
-		
+		this.addTouches();
 		
 //		var actor = new cc.Sprite(res.CloseNormal_png);
 //		actor.setPosition(400, 200);
@@ -74,6 +74,48 @@ var GameLayer = cc.Layer.extend({
 		
 	},
 	
+	addTouches : function() {
+		if( 'touches' in cc.sys.capabilities ) {
+			cc.eventManager.addListener({
+				event: cc.EventListener.TOUCH_ONE_BY_ONE,
+				swallowTouches: true,
+				onTouchBegan: this.onTouchBegan,
+				onTouchMoved: this.onTouchMoved,
+				onTouchEnded: this.onTouchEnded,
+				onTouchCancelled: this.onTouchCancelled
+			}, this);
+		} else {
+			cc.log("TOUCH-ONE-BY-ONE test is not supported on desktop");
+		}
+	},
+	
+	onTouchBegan:function(touch, event) {
+		var pos = touch.getLocation();
+		var id = touch.getID();
+		cc.log("onTouchBegan at: " + pos.x + " " + pos.y + " Id:" + id );
+		
+		return true;
+		
+	},
+	onTouchMoved:function(touch, event) {
+		var pos = touch.getLocation();
+		var id = touch.getID();
+		cc.log("onTouchMoved at: " + pos.x + " " + pos.y + " Id:" + id );
+		
+	},
+	onTouchEnded:function(touch, event) {
+		var pos = touch.getLocation();
+		var id = touch.getID();
+		cc.log("onTouchEnded at: " + pos.x + " " + pos.y + " Id:" + id );
+		
+	},
+	onTouchCancelled:function(touch, event) {
+		var pos = touch.getLocation();
+		var id = touch.getID();
+		cc.log("onTouchCancelled at: " + pos.x + " " + pos.y + " Id:" + id );
+		
+	},
+	
 	addKey:function(){
 		var self = this;
 		if ('keyboard' in cc.sys.capabilities) {
@@ -87,7 +129,17 @@ var GameLayer = cc.Layer.extend({
 						strTemp += " the key name is:" + keyStr;
 						
 						if(keyStr == "s"){
-							if(self._playerBody.getOnLadder()){
+							
+							if(self._playerBody.isCollisionLadder()&&!self._playerBody.isOnLadder()){
+
+								self._playerBody.setOnLadder(true);
+
+								self._playerBody.setVy(0);
+								self._playerBody.setAy(0);
+								self._playerBody.clearEff();
+							}
+							
+							if(self._playerBody.isOnLadder()){
 								self._playerBody.addVy(-10);
 							}
 							
@@ -95,7 +147,17 @@ var GameLayer = cc.Layer.extend({
 							
 							self._playerBody.addVx(-10);
 						}else if(keyStr == "w"){
-							if(self._playerBody.getOnLadder()){
+							
+							if(self._playerBody.isCollisionLadder()&&!self._playerBody.isOnLadder()){
+
+								self._playerBody.setOnLadder(true);
+
+								self._playerBody.setVy(0);
+								self._playerBody.setAy(0);
+								self._playerBody.clearEff();
+							}
+							
+							if(self._playerBody.isOnLadder()){
 								self._playerBody.addVy(10);
 							}
 						}else if(keyStr == "d"){
@@ -116,21 +178,24 @@ var GameLayer = cc.Layer.extend({
 						strTemp += " the key name is:" + keyStr;
 						
 						if(keyStr == "s"){
-							if(self._playerBody.getOnLadder()){
+							
+							if(self._playerBody.isOnLadder()){
 								if(self._playerBody.getVy()<0){
 									self._playerBody.addVy(10);
 								}
-								
 							}
+							
 						}else if(keyStr == "a"){
 
 							self._playerBody.addVx(10);
 						}else if(keyStr == "w"){
-							if(self._playerBody.getOnLadder()){
+							
+							
+							
+							if(self._playerBody.isOnLadder()){
 								if(self._playerBody.getVy()>0){
 									self._playerBody.addVy(-10);
 								}
-								
 							}
 						}else if(keyStr == "d"){
 							self._playerBody.addVx(-10);

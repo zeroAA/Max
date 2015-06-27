@@ -3,7 +3,7 @@ var zsP_World = cc.Node.extend({
 	_G : 0,
 	_bodyArray:null,
 	_rigidBodyArray:null,
-	_realFall : false,
+
 	
 	drawNode:null,
 	
@@ -77,7 +77,21 @@ var zsP_World = cc.Node.extend({
 		body.setType(BODY_TYPE_RIGID_BODY_LADDER);
 		body.retain();
 		body.setPosition(200, 100);
+		
+		body.setState(BODY_STATE_MOVE_AND_BACK);
+		body.setVx(5);
+		body.setVy(5);
+		body.setMoveTime(30);
+		
 		_rigidBodyArray.push(body);
+		
+		var body = new zsP_Body(cc.rect(0, 0, 600, 200));
+		body.setType(BODY_TYPE_RIGID_BODY);
+		body.retain();
+		body.setFriction(1);
+		body.setOutForce(5);
+		body.setPosition(200, 100);
+//		_rigidBodyArray.push(body);
 		
 		return true;
 	},
@@ -104,39 +118,52 @@ var zsP_World = cc.Node.extend({
 			
 			var body =_bodyArray[i];
 			
-			body.setBefPos();
+			body.initState();
 			
-			
-			if (body.isCanFall()&&!body.getOnLadder()) {
-				
-				if(!this._realFall){
-					body._Vy -=this._G;
-				}else{
-					body._Ay -=this._G;
-				}
-			
+			if (body.isCanFall()&&!body.isOnLadder()) {
+				body._Vy -=this._G;
 			}
+			
 			
 			body.cycle(dt);
 			
-			body.setOnLadder(false);
-			
+//			body.setOnLadder(false);
+			var isCollisionLadder = false;
 			for(var j = 0;j<_rigidBodyArray.length;j++){
 				var body2 =_rigidBodyArray[j];
 				if(cc.rectIntersectsRect(body.getBodyRect(), body2.getBodyRect())){
 					
 					if(body2.getType() == BODY_TYPE_RIGID_BODY_LADDER){
-						if(!cc.rectIntersectsRect(body.getBefBodyRect(), body2.getBodyRect())){
-							body.setVy(0);
-							body.setAy(0);
-						}
-						
-						body.setOnLadder(true);
-						
-						if(cc.rectGetMinY(body.getBefBodyRect())>cc.rectGetMaxY(body2.getBefBodyRect())){
-							body.y = cc.rectGetMaxY(body2.getBodyRect());
-							body.setVy(0);
-							body.setAy(0);
+						isCollisionLadder = true;
+						body.setCollisionLadder(true);
+						if(body.isOnLadder()){
+//							if(!cc.rectIntersectsRect(body.getBefBodyRect(), body2.getBodyRect())){
+//								body.setVy(0);
+//								body.setAy(0);
+//								body.clearEff();
+//							}
+							
+							if(cc.rectGetMinY(body.getBefBodyRect())>cc.rectGetMaxY(body2.getBefBodyRect())){
+								body.y = cc.rectGetMaxY(body2.getBodyRect());
+								body.setVy(0);
+								body.setAy(0);
+								body.clearDownEff_y();
+							}
+							
+							if(body2.getBefPos().x != body2.x&&(body.getDir()!=BODY_DIR_LEFT&&body.getDir()!=BODY_DIR_RIGHT)){// 添加
+								// 移动平台
+								// 摩擦力
+								body.setEff_X_Time(1,(body2.x-body2.getBefPos().x)*body2.getFriction());
+							}
+							
+							if(body2.getBefPos().y != body2.y&&(body.getDir()!=BODY_DIR_UP&&body.getDir()!=BODY_DIR_DOWN)){// 添加
+								// 移动平台
+								// 摩擦力
+								
+								body.setEff_Y_Time(1,(body2.y-body2.getBefPos().y)*body2.getFriction());
+	
+								
+							}
 						}
 					}else{
 						
@@ -148,6 +175,7 @@ var zsP_World = cc.Node.extend({
 									body.y = cc.rectGetMaxY(body2.getBodyRect())
 									body.setVy(0);
 									body.setAy(0);
+									body.clearEff_y();
 								}else{
 									body.x = cc.rectGetMaxX(body2.getBodyRect());
 									body.clearEff_x();
@@ -159,7 +187,7 @@ var zsP_World = cc.Node.extend({
 									body.y = y+cc.rectGetMinY(body2.getBodyRect());
 									body.setVy(0);
 									body.setAy(0);
-
+									body.clearEff_y();
 									if(body2.getFriction()<1){
 										body.setEff_X_Time(1,-this._G*(1-body2.getFriction()));
 
@@ -174,6 +202,7 @@ var zsP_World = cc.Node.extend({
 									body.y = cc.rectGetMaxY(body2.getBodyRect())
 									body.setVy(0);
 									body.setAy(0);
+									body.clearEff_y();
 								}else{
 									body.x = cc.rectGetMinX(body2.getBodyRect())-body.getBodyRect().width;
 									body.clearEff_x();
@@ -191,6 +220,8 @@ var zsP_World = cc.Node.extend({
 										body.setEff_X_Time(1,this._G*(1-body2.getFriction()));
 
 									}
+									
+									body.clearEff_y();
 								}
 							}
 
@@ -203,10 +234,10 @@ var zsP_World = cc.Node.extend({
 								body.setVy(0);
 								body.setAy(0);
 
-								if(body2.getBefPos().x != body2.x&&body.getDir()==BODY_DIR_STAY){// 添加
+								if(body2.getBefPos().x != body2.x&&(body.getDir()!=BODY_DIR_LEFT&&body.getDir()!=BODY_DIR_RIGHT)){// 添加
 									// 移动平台
 									// 摩擦力
-									body.x+=(body2.x-body2.getBefPos().x)*body2.getFriction();
+									body.setEff_X_Time(1,(body2.x-body2.getBefPos().x)*body2.getFriction());
 								}
 
 								if(body2.getFriction()<1&&body.getBefVx()!=0&&body.getVx()==0){// 添加上面物体摩擦力
@@ -214,13 +245,21 @@ var zsP_World = cc.Node.extend({
 
 									body.setEff_X_Time(30*(1-body2.getFriction()),body2.getBefVx()*(1-body2.getFriction()));
 								}
-
+								
+								if(body2.getOutForce()!=0){//添加赋予外力
+									
+									body.setEff_X_Time(1, body2.getOutForce()*(body2.getFriction()));
+									
+								}
+								
+								body.clearDownEff_y();
+							
 								continue;
 							}else if(cc.rectGetMinY(body2.getBefBodyRect())>=cc.rectGetMaxY(body.getBefBodyRect())){ // 从下往上
 								body.y = cc.rectGetMinY(body2.getBodyRect())-body.getBodyRect().height+1;
 								body.setVy(0);
 								body.setAy(0);
-
+								body.clearUpEff_y();
 								continue;
 							}
 
@@ -250,7 +289,25 @@ var zsP_World = cc.Node.extend({
 				}
 			}
 			
-			body.setBefVx();
+			if(!isCollisionLadder){
+				body.setCollisionLadder(false);
+				body.setOnLadder(false);
+			}
+			
+			if(body._isClear_eff_x){
+				body.clearEff_x_data();
+			}
+			if(body._isClear_eff_y){
+				body.clearEff_y_data();
+			}else if(body._isClear_Up_eff_y){
+				body.clearUpEff_y_data();
+			}else if(body._isClear_Down_eff_y){
+				body.clearDownEff_y_data();
+			}
+			
+			body.addEffV();
+			
+			
 		}
 		
 		

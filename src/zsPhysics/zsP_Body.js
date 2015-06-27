@@ -17,6 +17,10 @@ var BODY_DIR_RIGHT = 1;
 
 var BODY_DIR_LEFT = 2;
 
+var BODY_DIR_UP = 3;
+
+var BODY_DIR_DOWN = 4;
+
 var BODY_STATE_NORMAL = 0;
 
 var BODY_STATE_RIGID_BODY = 1;
@@ -31,7 +35,9 @@ var zsP_Body = cc.Node.extend({
 	
 	_isCanFall : false,//是否受到重力影响
 	
-	_isOnLadder : false,
+	_isOnLadder : false,//是否在爬梯子
+	
+	_isCollisionLadder : false,//是否碰到梯子
 	
 	_type : BODY_TYPE_NORMAL,
 	
@@ -49,19 +55,22 @@ var zsP_Body = cc.Node.extend({
 	_Ax : 0,//加速度x
 	_Ay : 0,//加速度y
 	
-	_eff_x : 0,//影响速度x
-	_eff_x_time : 0,//影响速度x时间
-	_eff_Ax : 0,//影响速度加速度
+	_isClear_eff_x:false,//是否清除影响速度x
+	_eff_x : [],//影响速度x时间
 	
-	_eff_y : 0,//影响速度y
-	_eff_y_time : 0,//影响速度y时间
-	_eff_Ay : 0,//影响速度加速度
+	_isClear_eff_y:false,//是否清除影响向上速度y
+	_isClear_Up_eff_y:false,//是否清除影响向上速度y
+	_isClear_Down_eff_y:false,//是否清除影响向下速度y
+	
+	_eff_y : [],//影响速度y
 	
 	
 	_moveTime : 0,//移动时间
 	_nowMoveTime : 0,
 	
 	_friction : 1,//摩擦力0-1百分系数
+	
+	_outForce : 0,//给上面物体附加外力
 
 	ctor:function (bodyRect) {
 		
@@ -107,19 +116,6 @@ var zsP_Body = cc.Node.extend({
 			this._Vy += this._Ay;
 			
 			
-			if(this._eff_x_time>0){
-				
-				this._eff_x_time--;
-				this.x+=this._eff_x;
-				this._eff_x+=this._eff_Ax;
-			}
-			
-			if(this._eff_y_time>0){
-
-				this._eff_y_time--;
-				this.y+=this._eff_y;
-				this._eff_y+=this._eff_Ay;
-			}
 			
 			this.setDir();
 			
@@ -190,6 +186,10 @@ var zsP_Body = cc.Node.extend({
 		}else if(this._Vx < 0){
 			this._dir = BODY_DIR_LEFT;
 
+		}else if(this._Vy > 0){
+			this._dir = BODY_DIR_UP;
+		}else if(this._Vy < 0){
+			this._dir = BODY_DIR_DOWN;
 		}else{
 			this._dir = BODY_DIR_STAY;
 		}
@@ -233,7 +233,7 @@ var zsP_Body = cc.Node.extend({
 	},
 	
 	setJump:function(vy){
-		if(this.getOnLadder()){
+		if(this.isOnLadder()){
 			this.setEff_Y_Time(8, 25);
 		}else{
 			this._Vy = vy;
@@ -260,37 +260,166 @@ var zsP_Body = cc.Node.extend({
 	
 	setEff_X_Time:function(time,speed){
 		
-		this._eff_x_time =time;
-		
-		this._eff_x = speed;
-		
-//		this._eff_Ax -= this._eff_x/this._eff_x_time;
-		
-//		cc.log("??!!!"+this._eff_x_time+"  "+this._eff_x);
+		this._eff_x.push([time,speed]);
 		
 	},
+	
 	
 	setEff_Y_Time:function(time,speed){
 
-		this._eff_y_time =time;
-
-		this._eff_y = speed;
+		this._eff_y.push([time,speed]);
 
 
 
 	},
 	
+	getEff_Y_Time : function() {
+		return this._eff_y.length;
+	},
+	
+	
 	clearEff_x:function(){
-		this._eff_x_time =0;
-		this._eff_x = 0;
+		this._isClear_eff_x = true;
 		
+	},
+	
+	clearEff_x_data : function() {
+		this._eff_x = [];
+		
+		this._isClear_eff_x = false;
+	},
+	
+	clearUpEff_y:function(){
+		
+		this._isClear_Up_eff_y = true;
+		if (this._isClear_Down_eff_y) {
+			this._isClear_eff_y = true;
+		}
+	},
+	
+	clearUpEff_y_data:function(){
+
+		for (var i = 0; i < this._eff_y.length; ++i) {
+			
+			if(this._eff_y[i][1]>0){
+				this._eff_y.splice(i, 1);
+			}
+		}
+		this._isClear_Up_eff_y = false;
+	},
+	
+	
+	
+	clearDownEff_y:function(){
+		
+		this._isClear_Down_eff_y = true;
+		
+		if (this._isClear_Up_eff_y) {
+			this._isClear_eff_y = true;
+		}
+		
+	},
+	
+	clearDownEff_y_data:function(){
+		
+		for (var i = 0; i < this._eff_y.length; ++i) {
+			
+			if(this._eff_y[i][1]<0){
+				
+				this._eff_y.splice(i, 1);
+			}
+		}
+		this._isClear_Down_eff_y = false;
+		
+		
+	},
+	
+	clearEff_y:function(){
+		this._isClear_eff_y = true;
+	},
+	
+	clearEff_y_data:function(){
+		
+		this._eff_y = [];
+		this._isClear_eff_y = false;
+		this._isClear_Down_eff_y = false;
+		this._isClear_Up_eff_y = false;
+	},
+	
+	clearEff:function(){
+		this.clearEff_x();
+		this.clearEff_y();
 	},
 	
 	setOnLadder:function(on){
 		this._isOnLadder = on;
 	},
 	
-	getOnLadder:function(){
+	isOnLadder:function(){
 		return this._isOnLadder;
+	},
+	
+	addEffV:function(){
+
+		if(this._eff_x.length>0){
+			
+			var addX = 0;
+			
+			for(var i = 0;i<this._eff_x.length;++i){
+				this._eff_x[i][0]--;
+				addX += this._eff_x[i][1];
+				
+				if(this._eff_x[i][0]<=0){
+					this._eff_x.splice(i, 1);
+					i--;
+					continue;
+				}
+			}
+			
+			this.x+=addX;
+			
+		}
+		
+		if(this._eff_y.length>0){
+			
+			var addY = 0;
+			for(var i = 0;i<this._eff_y.length;++i){
+				this._eff_y[i][0]--;
+				addY += this._eff_y[i][1];
+
+				if(this._eff_y[i][0]<=0){
+					this._eff_y.splice(i, 1);
+					i--;
+					continue;
+				}
+			}
+			
+			
+			this.y +=addY;
+			
+		}	
+	},
+	
+	initState:function(){
+		this.setBefPos();
+		this.setBefVx();
+		this._isClear_eff_x = false;
+		this._isClear_eff_y = false;
+	},
+	
+	setOutForce : function(f){
+		this._outForce = f;
+	},
+	
+	getOutForce : function() {
+		return this._outForce;
+	},
+	
+	setCollisionLadder : function(is){
+		this._isCollisionLadder = is;
+	},
+	
+	isCollisionLadder : function() {
+		return this._isCollisionLadder;
 	},
 });
