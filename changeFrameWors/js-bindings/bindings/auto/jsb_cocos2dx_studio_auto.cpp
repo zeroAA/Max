@@ -5158,6 +5158,26 @@ bool js_cocos2dx_studio_ArmatureAnimation_getCurrentMovementID(JSContext *cx, ui
     JS_ReportError(cx, "js_cocos2dx_studio_ArmatureAnimation_getCurrentMovementID : wrong number of arguments: %d, was expecting %d", argc, 0);
     return false;
 }
+////zs add
+bool js_cocos2dx_studio_ArmatureAnimation_getMovementID(JSContext *cx, uint32_t argc, jsval *vp)
+{
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
+    js_proxy_t *proxy = jsb_get_js_proxy(obj);
+    cocostudio::ArmatureAnimation* cobj = (cocostudio::ArmatureAnimation *)(proxy ? proxy->ptr : NULL);
+    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_studio_ArmatureAnimation_getMovementID : Invalid Native Object");
+    if (argc == 0) {
+        std::string ret = cobj->getMovementID();
+        jsval jsret = JSVAL_NULL;
+        jsret = std_string_to_jsval(cx, ret);
+        args.rval().set(jsret);
+        return true;
+    }
+    
+    JS_ReportError(cx, "js_cocos2dx_studio_ArmatureAnimation_getMovementID : wrong number of arguments: %d, was expecting %d", argc, 0);
+    return false;
+}
+////
 bool js_cocos2dx_studio_ArmatureAnimation_create(JSContext *cx, uint32_t argc, jsval *vp)
 {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
@@ -5258,6 +5278,10 @@ void js_register_cocos2dx_studio_ArmatureAnimation(JSContext *cx, JS::HandleObje
         JS_FN("getMovementCount", js_cocos2dx_studio_ArmatureAnimation_getMovementCount, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("playWithIndex", js_cocos2dx_studio_ArmatureAnimation_playWithIndex, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("getCurrentMovementID", js_cocos2dx_studio_ArmatureAnimation_getCurrentMovementID, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        ////zs add
+        JS_FN("getMovementID", js_cocos2dx_studio_ArmatureAnimation_getMovementID, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        ////
+        
         JS_FS_END
     };
 
@@ -6439,6 +6463,26 @@ bool js_cocos2dx_studio_Armature_getBoneDic(JSContext *cx, uint32_t argc, jsval 
     JS_ReportError(cx, "js_cocos2dx_studio_Armature_getBoneDic : wrong number of arguments: %d, was expecting %d", argc, 0);
     return false;
 }
+///////zs add
+bool js_cocos2dx_studio_Armature_getBoneNum(JSContext *cx, uint32_t argc, jsval *vp)
+{
+    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
+    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
+    js_proxy_t *proxy = jsb_get_js_proxy(obj);
+    cocostudio::Armature* cobj = (cocostudio::Armature *)(proxy ? proxy->ptr : NULL);
+    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_studio_Armature_getBoneNum : Invalid Native Object");
+    if (argc == 0) {
+        ssize_t ret = cobj->getBoneNum();
+        jsval jsret = JSVAL_NULL;
+        jsret = ssize_to_jsval(cx, ret);
+        args.rval().set(jsret);
+        return true;
+    }
+    
+    JS_ReportError(cx, "js_cocos2dx_studio_Armature_getBoneNum : wrong number of arguments: %d, was expecting %d", argc, 0);
+    return false;
+}
+///////
 bool js_cocos2dx_studio_Armature_create(JSContext *cx, uint32_t argc, jsval *vp)
 {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
@@ -6607,6 +6651,11 @@ void js_register_cocos2dx_studio_Armature(JSContext *cx, JS::HandleObject global
         JS_FN("getOffsetPoints", js_cocos2dx_studio_Armature_getOffsetPoints, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("setBlendFunc", js_cocos2dx_studio_Armature_setBlendFunc, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FN("getBoneDic", js_cocos2dx_studio_Armature_getBoneDic, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        
+        ////zs add
+        JS_FN("getBoneNum", js_cocos2dx_studio_Armature_getBoneNum, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
+        ////
+        
         JS_FN("ctor", js_cocostudio_Armature_ctor, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_FS_END
     };
