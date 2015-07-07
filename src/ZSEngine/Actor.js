@@ -1,5 +1,3 @@
-var Actor_STATE_NORMAL = 100;
-var Actor_STATE_DEAD = 101;
 
 var Actor_const = {
 		STATE_NORMAL : 100,
@@ -22,11 +20,15 @@ var Actor = ccs.Armature.extend({
 		this._body1 = new Array();
 		this._body2 = new Array();
 		
-		this.setBodyPonit();
+//		this.setBodyPonit();
 		this.playWithIndex(0);
 		if(DEBUG_DRAW){
 			this.debugDraw();
 		}
+		
+		
+		
+		
 		
 		return true;
 	},
@@ -39,19 +41,25 @@ var Actor = ccs.Armature.extend({
 		this._state = state;
 	},
 	
-	cycle:function(dt){
-		
+	setProState : function(state){
+		this._proState = state;
 	},
 	
-	getCurrentMovementID:function(){
-		return "";
+	getProState : function() {
+		return this._proState;
+	},
+	
+	cycle:function(dt){
+		
 	},
 	
 	setBodyPonit:function(){
 		this._body1 = [];
 		this._body2 = [];
-		
-		for(var i = 0 ; i < 100 ; ++i){
+//		cc.getmap
+//		cc.log("le : "+ this.getBoneNum());
+//		cc.log("name : "+this.getAnimation().getMovementID());
+		for(var i = 1 ; i < this.getBoneNum() ; ++i){
 			var str = "body"+i+"_1";
 			
 			if(this.getBone(str)){
@@ -65,6 +73,14 @@ var Actor = ccs.Armature.extend({
 		}
 	},
 	
+	isCollisionBodyRect : function(rect) {
+		return this.isCollisionBodyRectByIndext(rect,0);
+	},
+	
+	isCollisionBodyRectByIndext : function(rect,indext) {
+		return cc.rectIntersectsRect(this.getBodyRectByIndext(indext), rect);
+	},
+	
 	getBodyRect:function(){
 		return this.getBodyRectByIndext(0);
 	},
@@ -73,7 +89,7 @@ var Actor = ccs.Armature.extend({
 		if(indext>this._body1.length){
 			cc.log(this.getName() +"getBodyRect indext is over!");
 		}
-		var rect = cc.rect(this._body1[indext].x+this.x, this._body1[indext].y+this.y, this._body2[indext].x-this._body1[indext].x, this._body2[indext].y-this._body1[indext].y);
+		var rect = cc.rect(this._body1[indext].x+this.x, this._body2[indext].y+this.y, this._body2[indext].x-this._body1[indext].x, this._body1[indext].y-this._body2[indext].y);
 		
 		return rect;
 	},

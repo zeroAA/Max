@@ -12,13 +12,15 @@ var ActorManage = cc.Node.extend({
 	},
 	
 	addActor : function(actor) {
-		this.addActorAndZ(actor,0);
+//		this.addActorAndZ(actor,0);
+		this._actorSet.push(actor);
+		this.addChild(actor, actor.getLocalZOrder());
 	},
 	
-	addActorAndZ : function(actor , z) {
-		this._actorSet.push(actor);
-		this.addChild(actor, z);
-	},
+//	addActorAndZ : function(actor , z) {
+//		this._actorSet.push(actor);
+//		this.addChild(actor, actor.getLocalZOrder());
+//	},
 	
 	
 	cycle:function(dt){
