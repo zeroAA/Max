@@ -16,6 +16,12 @@
     "src/Common.js",
     "src/Game.js",
     "src/zsPhysics/zsP_World.js",
-    "src/zsPhysics/zsP_Body.js"
+    "src/zsPhysics/zsP_Body.js",
+    "src/zsEngine/Actor.js",
+    "src/zsEngine/ActorManage.js",
+    "src/zsEngine/Tools.js",
+    "src/zsEngine/Sprite.js",
+    "src/zsEngine/SpriteManage.js",
+    "src/zsEngine/TiledMap.js"
   ]
 }

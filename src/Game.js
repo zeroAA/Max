@@ -17,13 +17,19 @@ var GameLayer = cc.Layer.extend({
 	
 	_bg_layer:null,
 	
-	map:null,
+	_map:null,
 	
 	_playerBody:null,
+	
+	_drawNode : null,
 	
 	ctor:function () {
 		
 		this._super();
+		
+		this._drawNode = new cc.DrawNode();
+
+		this.addChild(this._drawNode, 110);
 		
 		WORLD = new zsP_World();
 		WORLD.setG(5);
@@ -36,7 +42,7 @@ var GameLayer = cc.Layer.extend({
 		
 		this._playerBody.setType(BODY_TYPE_NORMAL);
 		this._playerBody.setIsCanFall(true);
-		this._playerBody.setPosition(400, 500);
+		this._playerBody.setPosition(576, 500);
 
 		WORLD.addBody(this._playerBody);
 		
@@ -46,9 +52,16 @@ var GameLayer = cc.Layer.extend({
 	
 		this.addChild(this._bg_layer,this.BG_Z);
 		
-		this.map = new cc.TMXTiledMap(res.map1_tmx);
+		this._map = new TiledMap(res.map1_tmx);
 		
-		this.addChild(this.map, -5);
+//		this._map.getLayer("p").setVisible(false);
+		
+		
+		this.addChild(this._map, -5);
+//		cc.log(this.map.getIndextAt(cc.p(100,100)).x+" y :"+this.map.getIndextAt(cc.p(100,100)).y);
+//		this._map.getInfoAt(cc.p(100,100), "p", "type");
+		
+		
 		
 		ccs.armatureDataManager.addArmatureFileInfo(res.player_1_csb);
 		
@@ -127,9 +140,9 @@ var GameLayer = cc.Layer.extend({
 					if (keyStr.length > 0)
 					{
 						strTemp += " the key name is:" + keyStr;
-						
+
 						if(keyStr == "s"){
-							
+
 							if(self._playerBody.isCollisionLadder()&&!self._playerBody.isOnLadder()){
 
 								self._playerBody.setOnLadder(true);
@@ -138,16 +151,16 @@ var GameLayer = cc.Layer.extend({
 								self._playerBody.setAy(0);
 								self._playerBody.clearEff();
 							}
-							
+
 							if(self._playerBody.isOnLadder()){
 								self._playerBody.addVy(-10);
 							}
-							
+
 						}else if(keyStr == "a"){
-							
+
 							self._playerBody.addVx(-10);
 						}else if(keyStr == "w"){
-							
+
 							if(self._playerBody.isCollisionLadder()&&!self._playerBody.isOnLadder()){
 
 								self._playerBody.setOnLadder(true);
@@ -156,7 +169,7 @@ var GameLayer = cc.Layer.extend({
 								self._playerBody.setAy(0);
 								self._playerBody.clearEff();
 							}
-							
+
 							if(self._playerBody.isOnLadder()){
 								self._playerBody.addVy(10);
 							}
@@ -176,22 +189,22 @@ var GameLayer = cc.Layer.extend({
 					if (keyStr.length > 0)
 					{
 						strTemp += " the key name is:" + keyStr;
-						
+
 						if(keyStr == "s"){
-							
+
 							if(self._playerBody.isOnLadder()){
 								if(self._playerBody.getVy()<0){
 									self._playerBody.addVy(10);
 								}
 							}
-							
+
 						}else if(keyStr == "a"){
 
 							self._playerBody.addVx(10);
 						}else if(keyStr == "w"){
-							
-							
-							
+
+
+
 							if(self._playerBody.isOnLadder()){
 								if(self._playerBody.getVy()>0){
 									self._playerBody.addVy(-10);
@@ -237,10 +250,37 @@ var GameLayer = cc.Layer.extend({
 		cc.log("Key flags changed:" + key);
 	},
 	
+	
+	
 	update:function (dt) {
 		// chipmunk step
 		
+		
+		
+//		var array = this._map.getRectsAt(cc.rect(this._playerBody.getBodyRect().x-this._map.getTileSize().width) , "p",1,"type");
+		
+		WORLD.initCycle(dt);
+		
+		var add = 0;
+		var rect = cc.rect(this._playerBody.getBodyRect().x-add, this._playerBody.getBodyRect().y-add, this._playerBody.getBodyRect().width+add*2, this._playerBody.getBodyRect().height+add*2);
+		
+		var array = this._map.getRectsAt( rect, "p",1,"type");
+		
+		this._drawNode.clear();
+		
+//		var rect1 = cc.rect(this._map.getRectAt(cc.p(445, 200), "p"));
+//
+//		this._drawNode.drawRect(cc.p(rect1.x, rect1.y), cc.p(rect1.x+rect1.width, rect1.y+rect1.height), cc.color(0, 0, 255, 100), 2, cc.color(0, 0, 0, 100));
+
+//		cc.log("x : "+array.length);
+		for (var i = 0; i < array.length; i++) {
+			WORLD.addMapTiled(array[i], zsP_Body_const.TYPE_RIGID_BODY,1);
+//			this._drawNode.drawRect(cc.p(array[i].x, array[i].y), cc.p(array[i].x+array[i].width, array[i].y+array[i].height), cc.color(0, 0, 255, 100), 2, cc.color(0, 0, 0, 100));
+
+		}
+		
 		WORLD.cycle(dt);
+
 	},
 
 });

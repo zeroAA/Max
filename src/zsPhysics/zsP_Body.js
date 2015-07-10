@@ -1,4 +1,41 @@
 
+
+var zsP_Body_const = {
+		TYPE_NORMAL : 0,
+		
+		TYPE_RIGID_BODY : 1,
+		
+		TYPE_RIGID_BODY_SLOPE_UP : 2,
+
+	    TYPE_RIGID_BODY_SLOPE_DOWN : 3,
+
+	    TYPE_RIGID_BODY_DRIVE : 4,
+
+	    TYPE_RIGID_BODY_LADDER : 5,
+
+	    DIR_STAY : 0,
+
+	    DIR_RIGHT : 1,
+
+	    DIR_LEFT : 2,
+
+	    DIR_UP : 3,
+
+	    DIR_DOWN : 4,
+
+	    STATE_NORMAL : 0,
+
+	    STATE_RIGID_BODY : 1,
+
+	    STATE_MOVE : 100,
+
+	    STATE_MOVE_AND_BACK : 101,
+
+	   	STATE_BACK : 102,
+	   	
+	   	LIFE_TIME_LIMIT : -10,
+};
+
 var BODY_TYPE_NORMAL = 0;
 
 var BODY_TYPE_RIGID_BODY = 1;
@@ -71,6 +108,8 @@ var zsP_Body = cc.Node.extend({
 	_friction : 1,//摩擦力0-1百分系数
 	
 	_outForce : 0,//给上面物体附加外力
+	
+	_lifeTime : zsP_Body_const.LIFE_TIME_LIMIT,
 
 	ctor:function (bodyRect) {
 		
@@ -82,6 +121,14 @@ var zsP_Body = cc.Node.extend({
 //		this.Vy = 14;
 	
 		return true;
+	},
+	
+	setLifeTime : function(time) {
+		this._lifeTime = time;
+	},
+	
+	getLifeTime : function() {
+		return this._lifeTime;
 	},
 	
 	setType:function(type){
@@ -104,9 +151,15 @@ var zsP_Body = cc.Node.extend({
 	
 	cycle:function (dt) {
 		// chipmunk step
+		if(this._lifeTime!=zsP_Body_const.LIFE_TIME_LIMIT){
+			this._lifeTime--;
+		}
 		
 		switch (this._state) {
 		case BODY_STATE_NORMAL:
+//			if(this._type ==  BODY_TYPE_NORMAL){
+//				cc.log("???!!"+this._Vy);
+//			}
 			
 			
 			this.x += this._Vx;
@@ -384,6 +437,9 @@ var zsP_Body = cc.Node.extend({
 			
 			var addY = 0;
 			for(var i = 0;i<this._eff_y.length;++i){
+				
+				
+				
 				this._eff_y[i][0]--;
 				addY += this._eff_y[i][1];
 
