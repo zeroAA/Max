@@ -4,7 +4,7 @@
   <image source="map1.png" width="265" height="199"/>
  </tileset>
  <tileset firstgid="49" name="physics" tilewidth="32" tileheight="32" tilecount="10">
-  <image source="../../../../physics.png" width="320" height="32"/>
+  <image source="physics.png" width="320" height="32"/>
   <tile id="0">
    <properties>
     <property name="type" value="1"/>

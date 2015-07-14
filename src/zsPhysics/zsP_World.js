@@ -7,6 +7,12 @@ var zsP_World = cc.Node.extend({
 	
 	_drawNode:null,
 	
+	_eff_type1 : 1,
+	
+	_eff_type2 : 2,
+	
+	_eff_type3 : 3,
+	
 	ctor:function () {
 
 		this._super();
@@ -34,8 +40,8 @@ var zsP_World = cc.Node.extend({
 		body.setType(BODY_TYPE_RIGID_BODY);
 		body.retain();
 		body.setPosition(10, 50);
-		body.setFriction(0.5);
-		this._rigidBodyArray.push(body);
+//		body.setFriction(0.5);
+//		this._rigidBodyArray.push(body);
 		for(var i = 0 ; i < 1 ; ++i){
 			
 		
@@ -47,7 +53,7 @@ var zsP_World = cc.Node.extend({
 		body.setVx(5);
 		body.setMoveTime(30);
 		body.setFriction(0.5);
-			this._rigidBodyArray.push(body);
+//			this._rigidBodyArray.push(body);
 		}
 		var body = new zsP_Body(cc.rect(0, 0, 50, 10000));
 		body.setType(BODY_TYPE_RIGID_BODY);
@@ -104,7 +110,7 @@ var zsP_World = cc.Node.extend({
 		body.setLifeTime(time);
 		body.setPosition(rect.x, rect.y);
 		body.setFriction(0.5);
-//		this.addRigidBody(body);
+		this.addRigidBody(body);
 	},
 	
 	addRigidBody : function(body) {
@@ -188,14 +194,14 @@ var zsP_World = cc.Node.extend({
 							if(body2.getBefPos().x != body2.x&&(body.getDir()!=BODY_DIR_LEFT&&body.getDir()!=BODY_DIR_RIGHT)){// 添加
 								// 移动平台
 								// 摩擦力
-								body.setEff_X_Time(1,(body2.x-body2.getBefPos().x)*body2.getFriction());
+								body.setEff_X_Time(1,(body2.x-body2.getBefPos().x)*body2.getFriction(),1);
 							}
 
 							if(body2.getBefPos().y != body2.y&&(body.getDir()!=BODY_DIR_UP&&body.getDir()!=BODY_DIR_DOWN)){// 添加
 								// 移动平台
 								// 摩擦力
 
-								body.setEff_Y_Time(1,(body2.y-body2.getBefPos().y)*body2.getFriction());
+								body.setEff_Y_Time(1,(body2.y-body2.getBefPos().y)*body2.getFriction(),1);
 
 
 							}
@@ -208,15 +214,14 @@ var zsP_World = cc.Node.extend({
 							if(body2.getBefPos().x != body2.x&&(body.getDir()!=BODY_DIR_LEFT&&body.getDir()!=BODY_DIR_RIGHT)){// 添加
 								// 移动平台
 								// 摩擦力
-								body.setEff_X_Time(1,(body2.x-body2.getBefPos().x)*body2.getFriction());
+								body.setEff_X_Time(1,(body2.x-body2.getBefPos().x)*body2.getFriction(),2);
 							}
 							
 							if(body2.getBefPos().y != body2.y&&(body.getDir()!=BODY_DIR_UP&&body.getDir()!=BODY_DIR_DOWN)){// 添加
 								// 移动平台
 								// 摩擦力
 								
-								body.setEff_Y_Time(1,(body2.y-body2.getBefPos().y)*body2.getFriction());
-	
+								body.setEff_Y_Time(1,(body2.y-body2.getBefPos().y)*body2.getFriction(),2);
 								
 							}
 						}
@@ -244,7 +249,7 @@ var zsP_World = cc.Node.extend({
 									body.setAy(0);
 									body.clearEff_y();
 									if(body2.getFriction()<1){
-										body.setEff_X_Time(1,-this._G*(1-body2.getFriction()));
+										body.setEff_X_Time(1,-this._G*(1-body2.getFriction()),4);
 
 									}
 								}
@@ -272,7 +277,7 @@ var zsP_World = cc.Node.extend({
 									body.setAy(0);
 
 									if(body2.getFriction()<1){
-										body.setEff_X_Time(1,this._G*(1-body2.getFriction()));
+										body.setEff_X_Time(1,this._G*(1-body2.getFriction()),5);
 
 									}
 									
@@ -292,20 +297,21 @@ var zsP_World = cc.Node.extend({
 								if(body2.getBefPos().x != body2.x&&(body.getDir()!=BODY_DIR_LEFT&&body.getDir()!=BODY_DIR_RIGHT)){// 添加
 									// 移动平台
 									// 摩擦力
-									body.setEff_X_Time(1,(body2.x-body2.getBefPos().x)*body2.getFriction());
-								}
-
-								if(body2.getFriction()<1&&body.getBefVx()!=0&&body.getVx()==0){// 添加上面物体摩擦力
-									// 速度变化
-
-									body.setEff_X_Time(30*(1-body2.getFriction()),body2.getBefVx()*(1-body2.getFriction()));
+									body.setEff_X_Time(1,(body2.x-body2.getBefPos().x)*body2.getFriction(),6);
 								}
 								
+								
+								if(body2.getFriction()<0.8&&body.getBefVx()!=body.getVx()){// 添加上面物体摩擦力
+									// 速度变化
+//									cc.log("bVx : "+body.getBefVx()+"Vx : "+body.getVx()+"v : "+(body.getBefVx()-body.getVx())*(1-body2.getFriction()));
+//									body.setEff_X_Time(20*(1-body2.getFriction()),(body.getBefVx()-body.getVx())*(1-body2.getFriction()),7);
+									body.setInertia((body.getBefVx()-body.getVx())*(0.8-body2.getFriction()), 30*(1-body2.getFriction()));
+								}
 								
 								
 								if(body2.getOutForce()!=0){//添加赋予外力
 									
-									body.setEff_X_Time(1, body2.getOutForce()*(body2.getFriction()));
+									body.setEff_X_Time(1, body2.getOutForce()*(body2.getFriction()),8);
 									
 								}
 								
@@ -368,7 +374,7 @@ var zsP_World = cc.Node.extend({
 			
 			body.addEffV();
 			
-			
+			body.setBefVx();
 		}
 		
 		

@@ -110,6 +110,10 @@ var zsP_Body = cc.Node.extend({
 	_outForce : 0,//给上面物体附加外力
 	
 	_lifeTime : zsP_Body_const.LIFE_TIME_LIMIT,
+	
+	_inertia_x : 0,
+	
+	_inertia_time : 0,
 
 	ctor:function (bodyRect) {
 		
@@ -168,6 +172,10 @@ var zsP_Body = cc.Node.extend({
 			this._Vx += this._Ax;
 			this._Vy += this._Ay;
 			
+			if (this._inertia_time>0) {
+				this._inertia_time--;
+				this.x += this._inertia_x;
+			}
 			
 			
 			this.setDir();
@@ -201,6 +209,11 @@ var zsP_Body = cc.Node.extend({
 		default:
 			break;
 		}
+	},
+	
+	setInertia : function(x,t) {
+		this._inertia_x = x;
+		this._inertia_time = t;
 	},
 	
 	getBodyRect:function(){
@@ -311,16 +324,30 @@ var zsP_Body = cc.Node.extend({
 		return this._friction;
 	},
 	
-	setEff_X_Time:function(time,speed){
+	setEff_X_Time:function(time,speed,type){
 		
-		this._eff_x.push([time,speed]);
+		for (var i = 0; i < this._eff_x.length; i++) {
+			if (this._eff_x[i][2]==type) {
+				return;
+			}
+		}
+		
+		this._eff_x.push([time,speed,type]);
 		
 	},
 	
 	
-	setEff_Y_Time:function(time,speed){
+	setEff_Y_Time:function(time,speed,type){
+		
+		for (var i = 0; i < this._eff_y.length; i++) {
+			if (this._eff_y[i][2]==type) {
+//				this._eff_y[i][0] = time;
+//				this._eff_y[i][1] = speed;
+				return;
+			}
+		}
 
-		this._eff_y.push([time,speed]);
+		this._eff_y.push([time,speed,type]);
 
 
 
@@ -458,7 +485,7 @@ var zsP_Body = cc.Node.extend({
 	
 	initState:function(){
 		this.setBefPos();
-		this.setBefVx();
+//		this.setBefVx();
 		this._isClear_eff_x = false;
 		this._isClear_eff_y = false;
 	},
