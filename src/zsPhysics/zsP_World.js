@@ -1,5 +1,7 @@
 var zsP_World = cc.Node.extend({
 	
+	_range : null,
+	
 	_G : 0,
 	_bodyArray:null,
 	_rigidBodyArray:null,
@@ -13,9 +15,11 @@ var zsP_World = cc.Node.extend({
 	
 	_eff_type3 : 3,
 	
-	ctor:function () {
+	ctor:function (range) {
 
 		this._super();
+		
+		this._range = range;
 		
 		this._drawNode = new cc.DrawNode();
 		
@@ -109,7 +113,7 @@ var zsP_World = cc.Node.extend({
 		body.setType(type);
 		body.setLifeTime(time);
 		body.setPosition(rect.x, rect.y);
-		body.setFriction(0.5);
+//		body.setFriction(0.5);
 		this.addRigidBody(body);
 	},
 	
@@ -375,6 +379,16 @@ var zsP_World = cc.Node.extend({
 			body.addEffV();
 			
 			body.setBefVx();
+			if(!body.isPassRange()){
+				if (body.x<this._range.x) {
+					body.x = this._range.x;
+				}else if(body.x+body.getBodyRect().width > this._range.x+this._range.width){
+					body.x = this._range.x+this._range.width-body.getBodyRect().width;
+				}
+			}
+			
+			
+			
 		}
 		
 		

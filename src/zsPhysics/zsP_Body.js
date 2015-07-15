@@ -114,6 +114,8 @@ var zsP_Body = cc.Node.extend({
 	_inertia_x : 0,
 	
 	_inertia_time : 0,
+	
+	_isPassRange : false,
 
 	ctor:function (bodyRect) {
 		
@@ -123,8 +125,12 @@ var zsP_Body = cc.Node.extend({
 		
 //		this.Vx = -10;
 //		this.Vy = 14;
-	
+		
 		return true;
+	},
+	
+	isPassRange : function() {
+		return this._isPassRange;
 	},
 	
 	setLifeTime : function(time) {
@@ -176,6 +182,7 @@ var zsP_Body = cc.Node.extend({
 				this._inertia_time--;
 				this.x += this._inertia_x;
 			}
+			
 			
 			
 			this.setDir();
@@ -505,4 +512,5 @@ var zsP_Body = cc.Node.extend({
 	isCollisionLadder : function() {
 		return this._isCollisionLadder;
 	},
+	
 });

@@ -1,9 +1,3 @@
-//var TileMap_const = {
-//		DIR_DOWN : 0,
-//		DIR_UP : 1,
-//		DIR_LEFT : 
-//}
-
 
 var TiledMap = cc.TMXTiledMap.extend({
 
@@ -21,10 +15,10 @@ var TiledMap = cc.TMXTiledMap.extend({
 	
 	getInfoAt : function(pos,layer,info) {
 		
+		var tpos = this.getIndextAt(pos);
 		
-		
-		if (pos.x<0||pos.x>this.getMapSize().width*this.getTileSize().width
-				||pos.y<0||pos.y>this.getMapSize().height*this.getTileSize().height
+		if (tpos.x<0||tpos.x>=this.getMapSize().width
+				||tpos.y<0||tpos.y>=this.getMapSize().height
 				) {
 			return 0;
 		}
@@ -32,7 +26,7 @@ var TiledMap = cc.TMXTiledMap.extend({
 		var type = 0;
 		
 		
-		var id = type = this.getLayer(layer).getTileGIDAt(this.getIndextAt(pos));
+		var id = type = this.getLayer(layer).getTileGIDAt(tpos);
 		
 		if(id!=0){
 			var propertiesDict = this.getPropertiesForGID(id);

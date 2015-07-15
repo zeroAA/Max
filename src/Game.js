@@ -23,6 +23,16 @@ var GameLayer = cc.Layer.extend({
 	
 	_drawNode : null,
 	
+	_eye_pos : null,
+	
+	_eye_offset : null,
+	
+	_eye_rect : null,
+	
+	_PV : 10,
+	
+	_PX : 10,
+	
 	ctor:function () {
 		
 		this._super();
@@ -31,7 +41,18 @@ var GameLayer = cc.Layer.extend({
 
 		this.addChild(this._drawNode, 110);
 		
-		WORLD = new zsP_World();
+		this._eye_pos = new cc.p(0, 0);
+		
+		this._eye_offset = new cc.p(0, 0);
+		
+		this._map = new TiledMap(res.map1_tmx);
+
+//		this._map.getLayer("p").setVisible(false);
+
+
+		this.addChild(this._map, -5);
+		
+		WORLD = new zsP_World(cc.rect(0, 0, this._map.getMapSize().width*this._map.getTileSize().width, this._map.getMapSize().height*this._map.getTileSize().height));
 		WORLD.setG(5);
 		this.addChild(WORLD, 100);
 		
@@ -42,9 +63,11 @@ var GameLayer = cc.Layer.extend({
 		
 		this._playerBody.setType(BODY_TYPE_NORMAL);
 		this._playerBody.setIsCanFall(true);
-		this._playerBody.setPosition(576, 500);
+		this._playerBody.setPosition(150, 500);
 
 		WORLD.addBody(this._playerBody);
+//		this._eye_start_pos = this._playerBody.getPosition();
+		this._eye_rect = new cc.rect(cc.winSize.width*0.5,cc.winSize.height*0.6, 0, cc.winSize.height*0.5);
 		
 		var win = cc.winSize;
 		
@@ -52,12 +75,7 @@ var GameLayer = cc.Layer.extend({
 	
 		this.addChild(this._bg_layer,this.BG_Z);
 		
-		this._map = new TiledMap(res.map1_tmx);
 		
-//		this._map.getLayer("p").setVisible(false);
-		
-		
-		this.addChild(this._map, -5);
 //		cc.log(this.map.getIndextAt(cc.p(100,100)).x+" y :"+this.map.getIndextAt(cc.p(100,100)).y);
 //		this._map.getInfoAt(cc.p(100,100), "p", "type");
 		
@@ -153,12 +171,12 @@ var GameLayer = cc.Layer.extend({
 							}
 
 							if(self._playerBody.isOnLadder()){
-								self._playerBody.addVy(-10);
+								self._playerBody.addVy(-self._PV);
 							}
 
 						}else if(keyStr == "a"){
 
-							self._playerBody.addVx(-10);
+							self._playerBody.addVx(-self._PX);
 						}else if(keyStr == "w"){
 
 							if(self._playerBody.isCollisionLadder()&&!self._playerBody.isOnLadder()){
@@ -171,10 +189,10 @@ var GameLayer = cc.Layer.extend({
 							}
 
 							if(self._playerBody.isOnLadder()){
-								self._playerBody.addVy(10);
+								self._playerBody.addVy(self._PV);
 							}
 						}else if(keyStr == "d"){
-							self._playerBody.addVx(10);
+							self._playerBody.addVx(self._PX);
 						}else if(keyStr == "j"){
 
 						}else if(keyStr == "k"){
@@ -194,24 +212,24 @@ var GameLayer = cc.Layer.extend({
 
 							if(self._playerBody.isOnLadder()){
 								if(self._playerBody.getVy()<0){
-									self._playerBody.addVy(10);
+									self._playerBody.addVy(self._PV);
 								}
 							}
 
 						}else if(keyStr == "a"){
 
-							self._playerBody.addVx(10);
+							self._playerBody.addVx(self._PX);
 						}else if(keyStr == "w"){
 
 
 
 							if(self._playerBody.isOnLadder()){
 								if(self._playerBody.getVy()>0){
-									self._playerBody.addVy(-10);
+									self._playerBody.addVy(-self._PV);
 								}
 							}
 						}else if(keyStr == "d"){
-							self._playerBody.addVx(-10);
+							self._playerBody.addVx(-self._PX);
 						}else if(keyStr == "j"){
 
 						}else if(keyStr == "k"){
@@ -280,7 +298,61 @@ var GameLayer = cc.Layer.extend({
 		}
 		
 		WORLD.cycle(dt);
+		
+		this.setEyePos();
 
+	},
+	
+	setEyePos : function() {
+		
+//		this._eye_pos = cc.pSub(this._playerBody.getPosition(), this._eye_start_pos);
+		
+//		if(this._playerBody.getPositionX()>=this._eye_start_pos.x&&this._playerBody.getBefPos().x<this._eye_start_pos.x){
+//			this._eye_offset.x = this._eye_start_pos.x-this._playerBody.getPositionX();
+//		}
+		
+		if (this._playerBody.getPositionX()>=this._eye_rect.x&&this._playerBody.getPositionX()<=(this._map.getMapSize().width*this._map.getTileSize().width)-this._eye_rect.x) {
+			
+			this._eye_pos.x = this._eye_rect.x - this._playerBody.getPositionX();
+
+			this.setPositionX(this._eye_pos.x);
+		}
+		
+		if (this._playerBody.getPositionY()>=this._eye_rect.y) {
+			this._eye_pos.y = this._eye_rect.y - this._playerBody.getPositionY();
+
+//			this.setPositionY(this._eye_pos.y);
+			
+			if(this._eye_pos.y>this.getPositionY()){
+				this.y += this._PV;
+				if(this.y>this._eye_pos.y){
+					this.y = this._eye_pos.y;
+				}
+			}else if(this._eye_pos.y<this.getPositionY()){
+				this.y -= this._PV;
+				if(this.y<this._eye_pos.y){
+					this.y = this._eye_pos.y;
+				}
+			}
+			
+		}else{
+
+			if(0>this.getPositionY()){
+				this.y += this._PV;
+				if(this.y>0){
+					this.y = 0;
+				}
+			}else
+				
+			if(0<this.getPositionY()){
+				this.y -= this._PV;
+				if(this.y<0){
+					this.y = 0;
+				}
+			}
+		}
+		
+		
 	},
 
 });
