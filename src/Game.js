@@ -58,10 +58,10 @@ var GameLayer = cc.Layer.extend({
 		
 		
 		this._playerBody = new zsP_Body(cc.rect(0, 0, 100, 100));
-
+		
 //		this._playerBody.retain();
 		
-		this._playerBody.setType(BODY_TYPE_NORMAL);
+		this._playerBody.setType(zsP_Body_const.TYPE_NORMAL);
 		this._playerBody.setIsCanFall(true);
 		this._playerBody.setPosition(150, 500);
 
@@ -187,7 +187,6 @@ var GameLayer = cc.Layer.extend({
 								self._playerBody.setAy(0);
 								self._playerBody.clearEff();
 							}
-
 							if(self._playerBody.isOnLadder()){
 								self._playerBody.addVy(self._PV);
 							}
@@ -282,7 +281,10 @@ var GameLayer = cc.Layer.extend({
 		var add = 0;
 		var rect = cc.rect(this._playerBody.getBodyRect().x-add, this._playerBody.getBodyRect().y-add, this._playerBody.getBodyRect().width+add*2, this._playerBody.getBodyRect().height+add*2);
 		
-		var array = this._map.getRectsAt( rect, "p",1,"type");
+		var all = this._map.getRectsAt(rect, "p","type");
+		
+		var array = all[0];
+		var type = all[1];
 		
 		this._drawNode.clear();
 		
@@ -292,7 +294,8 @@ var GameLayer = cc.Layer.extend({
 
 //		cc.log("x : "+array.length);
 		for (var i = 0; i < array.length; i++) {
-			WORLD.addMapTiled(array[i], zsP_Body_const.TYPE_RIGID_BODY,1);
+			
+			WORLD.addMapTiled(array[i],type[i]);
 //			this._drawNode.drawRect(cc.p(array[i].x, array[i].y), cc.p(array[i].x+array[i].width, array[i].y+array[i].height), cc.color(0, 0, 255, 100), 2, cc.color(0, 0, 0, 100));
 
 		}

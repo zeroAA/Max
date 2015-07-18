@@ -1,17 +1,18 @@
 
 
 var zsP_Body_const = {
+		
 		TYPE_NORMAL : 0,
 		
 		TYPE_RIGID_BODY : 1,
 		
 		TYPE_RIGID_BODY_SLOPE_UP : 2,
 
-	    TYPE_RIGID_BODY_SLOPE_DOWN : 3,
+		TYPE_RIGID_BODY_SLOPE_DOWN : 3,
 
-	    TYPE_RIGID_BODY_DRIVE : 4,
+		TYPE_RIGID_BODY_DRIVE : 4,
 
-	    TYPE_RIGID_BODY_LADDER : 5,
+		TYPE_RIGID_BODY_LADDER : 5,
 
 	    DIR_STAY : 0,
 
@@ -34,39 +35,40 @@ var zsP_Body_const = {
 	   	STATE_BACK : 102,
 	   	
 	   	LIFE_TIME_LIMIT : -10,
+	   
 };
 
-var BODY_TYPE_NORMAL = 0;
-
-var BODY_TYPE_RIGID_BODY = 1;
-
-var BODY_TYPE_RIGID_BODY_SLOPE_UP = 2;
-
-var BODY_TYPE_RIGID_BODY_SLOPE_DOWN = 3;
-
-var BODY_TYPE_RIGID_BODY_DRIVE = 4;
-
-var BODY_TYPE_RIGID_BODY_LADDER = 5;
-
-var BODY_DIR_STAY = 0;
-
-var BODY_DIR_RIGHT = 1;
-
-var BODY_DIR_LEFT = 2;
-
-var BODY_DIR_UP = 3;
-
-var BODY_DIR_DOWN = 4;
-
-var BODY_STATE_NORMAL = 0;
-
-var BODY_STATE_RIGID_BODY = 1;
-
-var BODY_STATE_MOVE = 100;
-
-var BODY_STATE_MOVE_AND_BACK = 101;
-
-var BODY_STATE_BACK = 102;
+//var zsP_Body_const.TYPE_NORMAL = 0;
+//
+//var zsP_Body_const.TYPE_RIGID_BODY = 1;
+//
+//var zsP_Body_const.TYPE_RIGID_zsP_Body_const.SLOPE_UP = 2;
+//
+//var zsP_Body_const.TYPE_RIGID_zsP_Body_const.SLOPE_DOWN = 3;
+//
+//var zsP_Body_const.TYPE_RIGID_zsP_Body_const.DRIVE = 4;
+//
+//var zsP_Body_const.TYPE_RIGID_zsP_Body_const.LADDER = 5;
+//
+//var zsP_Body_const.DIR_STAY = 0;
+//
+//var zsP_Body_const.DIR_RIGHT = 1;
+//
+//var zsP_Body_const.DIR_LEFT = 2;
+//
+//var zsP_Body_const.DIR_UP = 3;
+//
+//var zsP_Body_const.DIR_DOWN = 4;
+//
+//var zsP_Body_const.STATE_NORMAL = 0;
+//
+//var zsP_Body_const.STATE_RIGID_BODY = 1;
+//
+//var zsP_Body_const.STATE_MOVE = 100;
+//
+//var zsP_Body_const.STATE_MOVE_AND_BACK = 101;
+//
+//var zsP_Body_const.STATE_BACK = 102;
 
 var zsP_Body = cc.Node.extend({
 	
@@ -76,13 +78,13 @@ var zsP_Body = cc.Node.extend({
 	
 	_isCollisionLadder : false,//是否碰到梯子
 	
-	_type : BODY_TYPE_NORMAL,
+	_type : zsP_Body_const.TYPE_NORMAL,
 	
-	_state : BODY_STATE_NORMAL,
+	_state : zsP_Body_const.STATE_NORMAL,
 	
 	_bodyRect : null,
 	
-	_dir : BODY_DIR_STAY,
+	_dir : zsP_Body_const.DIR_STAY,
 	
 	_befPos : null,//上次位置
 	_befVx : 0,// 上次速度
@@ -116,17 +118,30 @@ var zsP_Body = cc.Node.extend({
 	_inertia_time : 0,
 	
 	_isPassRange : false,
+	
+	_maxG : null,//最大重力加速度防止穿越
+	
+	
 
 	ctor:function (bodyRect) {
 		
 		this._super();
 		
-		this._bodyRect = bodyRect;
+		this.setBodyRect(bodyRect);
 		
 //		this.Vx = -10;
 //		this.Vy = 14;
 		
 		return true;
+	},
+	
+	setBodyRect : function(bodyRect) {
+		this._bodyRect = bodyRect;
+		this._maxG = bodyRect.height-1;
+	},
+	
+	getMaxG : function() {
+		return this._maxG;
 	},
 	
 	isPassRange : function() {
@@ -166,8 +181,8 @@ var zsP_Body = cc.Node.extend({
 		}
 		
 		switch (this._state) {
-		case BODY_STATE_NORMAL:
-//			if(this._type ==  BODY_TYPE_NORMAL){
+		case zsP_Body_const.STATE_NORMAL:
+//			if(this._type ==  zsP_Body_const.TYPE_NORMAL){
 //				cc.log("???!!"+this._Vy);
 //			}
 			
@@ -188,7 +203,7 @@ var zsP_Body = cc.Node.extend({
 			this.setDir();
 			
 			break;
-		case BODY_STATE_MOVE_AND_BACK:
+		case zsP_Body_const.STATE_MOVE_AND_BACK:
 			
 			this.x += this._Vx;
 			this.y += this._Vy;
@@ -196,11 +211,11 @@ var zsP_Body = cc.Node.extend({
 			this._nowMoveTime++;
 			if(this._nowMoveTime>=this._moveTime){
 				this._nowMoveTime = 0;
-				this.setState(BODY_STATE_BACK);
+				this.setState(zsP_Body_const.STATE_BACK);
 			}
 			
 			break;
-		case BODY_STATE_BACK:
+		case zsP_Body_const.STATE_BACK:
 			
 			this.x -= this._Vx;
 			this.y -= this._Vy;
@@ -208,7 +223,7 @@ var zsP_Body = cc.Node.extend({
 			this._nowMoveTime++;
 			if(this._nowMoveTime>=this._moveTime){
 				this._nowMoveTime = 0;
-				this.setState(BODY_STATE_MOVE_AND_BACK);
+				this.setState(zsP_Body_const.STATE_MOVE_AND_BACK);
 			}
 			
 			break;
@@ -254,17 +269,17 @@ var zsP_Body = cc.Node.extend({
 	
 	setDir:function(){
 		if(this._Vx > 0){
-			this._dir = BODY_DIR_RIGHT;
+			this._dir = zsP_Body_const.DIR_RIGHT;
 
 		}else if(this._Vx < 0){
-			this._dir = BODY_DIR_LEFT;
+			this._dir = zsP_Body_const.DIR_LEFT;
 
 		}else if(this._Vy > 0){
-			this._dir = BODY_DIR_UP;
+			this._dir = zsP_Body_const.DIR_UP;
 		}else if(this._Vy < 0){
-			this._dir = BODY_DIR_DOWN;
+			this._dir = zsP_Body_const.DIR_DOWN;
 		}else{
-			this._dir = BODY_DIR_STAY;
+			this._dir = zsP_Body_const.DIR_STAY;
 		}
 	},
 	
@@ -306,12 +321,8 @@ var zsP_Body = cc.Node.extend({
 	},
 	
 	setJump:function(vy){
-		if(this.isOnLadder()){
-			this.setEff_Y_Time(8, 25);
-		}else{
-			this._Vy = vy;
-		}
-		
+		this._Vy = vy;
+		this.setOnLadder(false);
 	},
 	
 	setMoveTime:function(time){

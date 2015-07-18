@@ -31,6 +31,7 @@ var TiledMap = cc.TMXTiledMap.extend({
 		if(id!=0){
 			var propertiesDict = this.getPropertiesForGID(id);
 			type = propertiesDict[info];
+			
 		}
 		
 		return type;
@@ -40,10 +41,13 @@ var TiledMap = cc.TMXTiledMap.extend({
 		return cc.rect(this.getLayer(layer).getPositionAt(this.getIndextAt(pos)).x, this.getLayer(layer).getPositionAt(this.getIndextAt(pos)).y, this.getTileSize().width, this.getTileSize().height);
 	},
 	
-	getRectsAt : function(body,layer,type,info) {
+	getRectsAt : function(body,layer,info) {
+		
+		var all = new Array();
 
 		var array = new Array();
 		
+		var type = new Array();
 		
 //		//右边
 //		x = cc.rectGetMaxX(body);
@@ -72,8 +76,9 @@ var TiledMap = cc.TMXTiledMap.extend({
 			}
 			var t = this.getInfoAt(cc.p(x, y),layer,info);
 
-			if(t == type){
+			if(t != 0){
 				array.push(this.getRectAt(cc.p(x, y), layer));
+				type.push(t);
 			}
 		}
 		
@@ -89,8 +94,9 @@ var TiledMap = cc.TMXTiledMap.extend({
 			}
 			var t = this.getInfoAt(cc.p(x, y),layer,info);
 
-			if(t == type){
+			if(t != 0){
 				array.push(this.getRectAt(cc.p(x, y), layer));
+				type.push(t);
 			}
 		}
 		////
@@ -103,8 +109,9 @@ var TiledMap = cc.TMXTiledMap.extend({
 			
 			var t = this.getInfoAt(cc.p(x, y),layer,info);
 			
-			if(t == type){
+			if(t != 0){
 				array.push(this.getRectAt(cc.p(x, y), layer));
+				type.push(t);
 			}
 			
 			x +=this.getTileSize().width;
@@ -114,8 +121,9 @@ var TiledMap = cc.TMXTiledMap.extend({
 				
 				t = this.getInfoAt(cc.p(x, y),layer,info);
 
-				if(t == type){
+				if(t !=0){
 					array.push(this.getRectAt(cc.p(x, y), layer));
+					type.push(t);
 				}
 			}
 		}
@@ -141,8 +149,9 @@ var TiledMap = cc.TMXTiledMap.extend({
 			
 			var t = this.getInfoAt(cc.p(x, y),layer,info);
 
-			if(t == type){
+			if(t != 0){
 				array.push(this.getRectAt(cc.p(x, y), layer));
+				type.push(t);
 			}
 		}
 		
@@ -162,7 +171,8 @@ var TiledMap = cc.TMXTiledMap.extend({
 //			}
 //		}
 		////
-		
-		return array;
+		all.push(array);
+		all.push(type);
+		return all;
 	},
 });
