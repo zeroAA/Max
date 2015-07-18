@@ -1,5 +1,7 @@
 var zsP_World = cc.Node.extend({
 	
+	_maxG : 100,
+	
 	_range : null,
 	
 	_G : 0,
@@ -108,6 +110,10 @@ var zsP_World = cc.Node.extend({
 		return true;
 	},
 	
+	setMaxG : function(g) {
+		this._maxG = g;
+	},
+	
 	addMapTiled : function(rect,type,time) {
 		var body = new zsP_Body(cc.rect(0, 0, rect.width, rect.height));
 		body.setType(type);
@@ -159,6 +165,10 @@ var zsP_World = cc.Node.extend({
 			
 			if (body.isCanFall()&&!body.isOnLadder()) {
 				body._Vy -=this._G;
+				
+				if(body._Vy<-this._maxG){
+					body._Vy = -this._maxG;
+				}
 			}
 
 

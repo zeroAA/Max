@@ -67,7 +67,7 @@ var GameLayer = cc.Layer.extend({
 
 		WORLD.addBody(this._playerBody);
 //		this._eye_start_pos = this._playerBody.getPosition();
-		this._eye_rect = new cc.rect(cc.winSize.width*0.5,cc.winSize.height*0.6, 0, cc.winSize.height*0.5);
+		this._eye_rect = new cc.rect(cc.winSize.width*0.5,cc.winSize.height*0.5, 0, cc.winSize.height*0.5);
 		
 		var win = cc.winSize;
 		
@@ -311,46 +311,67 @@ var GameLayer = cc.Layer.extend({
 //			this._eye_offset.x = this._eye_start_pos.x-this._playerBody.getPositionX();
 //		}
 		
-		if (this._playerBody.getPositionX()>=this._eye_rect.x&&this._playerBody.getPositionX()<=(this._map.getMapSize().width*this._map.getTileSize().width)-this._eye_rect.x) {
+		if (this._playerBody.getPositionX()>this._eye_rect.x&&this._playerBody.getPositionX()<(this._map.getMapSize().width*this._map.getTileSize().width)-this._eye_rect.x) {
 			
 			this._eye_pos.x = this._eye_rect.x - this._playerBody.getPositionX();
 
 			this.setPositionX(this._eye_pos.x);
+		}else if(this._playerBody.getPositionX()<=this._eye_rect.x){
+			this.setPositionX(0);
+		}else if(this._playerBody.getPositionX()>=(this._map.getMapSize().width*this._map.getTileSize().width)-this._eye_rect.x){
+			this.setPositionX(-((this._map.getMapSize().width*this._map.getTileSize().width)-cc.winSize.width));
+			
+//			cc.log((this._map.getMapSize().width*this._map.getTileSize().width));
 		}
 		
-		if (this._playerBody.getPositionY()>=this._eye_rect.y) {
+		
+		if (this._playerBody.getPositionY()>this._eye_rect.y&&this._playerBody.getPositionY()<(this._map.getMapSize().height*this._map.getTileSize().height)-this._eye_rect.y) {
+
 			this._eye_pos.y = this._eye_rect.y - this._playerBody.getPositionY();
 
-//			this.setPositionY(this._eye_pos.y);
-			
-			if(this._eye_pos.y>this.getPositionY()){
-				this.y += this._PV;
-				if(this.y>this._eye_pos.y){
-					this.y = this._eye_pos.y;
-				}
-			}else if(this._eye_pos.y<this.getPositionY()){
-				this.y -= this._PV;
-				if(this.y<this._eye_pos.y){
-					this.y = this._eye_pos.y;
-				}
-			}
-			
-		}else{
+			this.setPositionY(this._eye_pos.y);
 
-			if(0>this.getPositionY()){
-				this.y += this._PV;
-				if(this.y>0){
-					this.y = 0;
-				}
-			}else
-				
-			if(0<this.getPositionY()){
-				this.y -= this._PV;
-				if(this.y<0){
-					this.y = 0;
-				}
-			}
+
+		}else if (this._playerBody.getPositionY()<=this._eye_rect.y){
+			this.setPositionY(0);
+		}else if (this._playerBody.getPositionY()>=(this._map.getMapSize().height*this._map.getTileSize().height)-this._eye_rect.y){
+			this.setPositionY(-((this._map.getMapSize().height*this._map.getTileSize().height)-cc.winSize.height));
 		}
+		
+//		if (this._playerBody.getPositionY()>=this._eye_rect.y) {
+//			
+//			this._eye_pos.y = this._eye_rect.y - this._playerBody.getPositionY();
+//
+////			this.setPositionY(this._eye_pos.y);
+//			
+//			if(this._eye_pos.y>this.getPositionY()){
+//				this.y += this._PV;
+//				if(this.y>this._eye_pos.y){
+//					this.y = this._eye_pos.y;
+//				}
+//			}else if(this._eye_pos.y<this.getPositionY()){
+//				this.y -= this._PV;
+//				if(this.y<this._eye_pos.y){
+//					this.y = this._eye_pos.y;
+//				}
+//			}
+//			
+//		}else{
+//
+//			if(0>this.getPositionY()){
+//				this.y += this._PV;
+//				if(this.y>0){
+//					this.y = 0;
+//				}
+//			}else
+//				
+//			if(0<this.getPositionY()){
+//				this.y -= this._PV;
+//				if(this.y<0){
+//					this.y = 0;
+//				}
+//			}
+//		}
 		
 		
 	},

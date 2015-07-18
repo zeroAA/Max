@@ -45,21 +45,38 @@ var TiledMap = cc.TMXTiledMap.extend({
 		var array = new Array();
 		
 		
+//		//右边
+//		x = cc.rectGetMaxX(body);
+//		y = cc.rectGetMaxY(body);
+//
+//		while (y > cc.rectGetMinY(body)) {
+//			var t = this.getInfoAt(cc.p(x, y),layer,info);
+//
+//			if(t == type){
+//				array.push(this.getRectAt(cc.p(x, y), layer));
+//			}
+//			y -= this.getTileSize().height;
+//			if(y<cc.rectGetMinY(body)){
+//				y = cc.rectGetMinY(body);
+//			}
+//		}
+		
 		//右边
 		x = cc.rectGetMaxX(body);
-		y = cc.rectGetMaxY(body);
+		y = cc.rectGetMinY(body);
 
-		while (y > cc.rectGetMinY(body)) {
+		while (y<cc.rectGetMaxY(body)) {
+			y += this.getTileSize().height;
+			if (y>cc.rectGetMaxY(body)) {
+				y = cc.rectGetMaxY(body);
+			}
 			var t = this.getInfoAt(cc.p(x, y),layer,info);
 
 			if(t == type){
 				array.push(this.getRectAt(cc.p(x, y), layer));
 			}
-			y -= this.getTileSize().height;
-			if(y<cc.rectGetMinY(body)){
-				y = cc.rectGetMinY(body);
-			}
 		}
+		
 		////
 		// 左边
 		x = cc.rectGetMinX(body);
@@ -94,6 +111,12 @@ var TiledMap = cc.TMXTiledMap.extend({
 			
 			if (x > cc.rectGetMaxX(body)) {
 				x = cc.rectGetMaxX(body);
+				
+				t = this.getInfoAt(cc.p(x, y),layer,info);
+
+				if(t == type){
+					array.push(this.getRectAt(cc.p(x, y), layer));
+				}
 			}
 		}
 		//////
@@ -101,13 +124,19 @@ var TiledMap = cc.TMXTiledMap.extend({
 		
 		
 		///上边
-		x = cc.rectGetMinX(body);
-		y = cc.rectGetMaxY(body);
 		
-		while (x < cc.rectGetMaxX(body)) {
-			x += this.getTileSize().width;
-			if (x>cc.rectGetMaxX(body)) {
+		var x = cc.rectGetMinX(body);
+		var y = cc.rectGetMaxY(body);
+
+		while (x<cc.rectGetMaxX(body)) {
+			
+			
+
+			x +=this.getTileSize().width;
+
+			if (x > cc.rectGetMaxX(body)) {
 				x = cc.rectGetMaxX(body);
+				break;
 			}
 			
 			var t = this.getInfoAt(cc.p(x, y),layer,info);
@@ -116,6 +145,22 @@ var TiledMap = cc.TMXTiledMap.extend({
 				array.push(this.getRectAt(cc.p(x, y), layer));
 			}
 		}
+		
+//		x = cc.rectGetMinX(body);
+//		y = cc.rectGetMaxY(body);
+//		
+//		while (x < cc.rectGetMaxX(body)) {
+//			x += this.getTileSize().width;
+//			if (x>cc.rectGetMaxX(body)) {
+//				x = cc.rectGetMaxX(body);
+//			}
+//			
+//			var t = this.getInfoAt(cc.p(x, y),layer,info);
+//
+//			if(t == type){
+//				array.push(this.getRectAt(cc.p(x, y), layer));
+//			}
+//		}
 		////
 		
 		return array;
