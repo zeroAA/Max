@@ -405,7 +405,7 @@ var zsP_World = cc.Node.extend({
 				}
 			}
 			
-			
+			body.setNodePos();
 			
 		}
 		

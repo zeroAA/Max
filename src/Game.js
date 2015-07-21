@@ -21,6 +21,8 @@ var GameLayer = cc.Layer.extend({
 	
 	_playerBody:null,
 	
+	_player : null,
+	
 	_drawNode : null,
 	
 	_eye_pos : null,
@@ -82,6 +84,10 @@ var GameLayer = cc.Layer.extend({
 		
 		
 		ccs.armatureDataManager.addArmatureFileInfo(res.player_1_csb);
+		
+		this._player = new Actor("player_1");
+		this._playerBody.setNode(this._player);
+		this.addChild(this._player, this.PLAYER_Z);
 		
 		this.addKey();
 		
