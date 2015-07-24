@@ -57,7 +57,7 @@ var GameLayer = cc.Layer.extend({
 		this.addChild(WORLD, 100);
 		
 		
-		this._playerBody = new zsP_Body(cc.rect(0, 0, 100, 100));
+		this._playerBody = new zsP_Body(cc.rect(0, 0, 60, 80));
 		
 //		this._playerBody.retain();
 		
