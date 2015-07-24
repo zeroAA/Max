@@ -121,7 +121,7 @@ var zsP_Body = cc.Node.extend({
 	
 	_maxG : null,//最大重力加速度防止穿越
 	
-	
+	_node : null,//显示对象
 
 	ctor:function (bodyRect) {
 		
@@ -133,6 +133,19 @@ var zsP_Body = cc.Node.extend({
 //		this.Vy = 14;
 		
 		return true;
+	},
+	
+	setNode : function(node) {
+		this._node = node;
+	},
+	
+	setNodePos : function() {
+		if(this._node != null){
+			this._node.setPosition(this.getPosition());
+		}else{
+			cc.log("zsbody _node is null");
+		}
+		
 	},
 	
 	setBodyRect : function(bodyRect) {
