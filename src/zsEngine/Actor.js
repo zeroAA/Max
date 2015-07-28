@@ -15,7 +15,7 @@ var Actor = ccs.Armature.extend({
 	_darwNode : null,
 	
 	ctor:function (name) {
-
+		
 		this._super(name);
 		this._body1 = new Array();
 		this._body2 = new Array();
@@ -86,8 +86,9 @@ var Actor = ccs.Armature.extend({
 	},
 	
 	getBodyRectByIndext:function(indext){
-		if(indext>this._body1.length){
-			cc.log(this.getName() +"getBodyRect indext is over!");
+		
+		if(indext>=this._body1.length){
+			cc.log(this.getName() +" getBodyRect indext is over!");
 		}
 		var rect = cc.rect(this._body1[indext].x+this.x, this._body2[indext].y+this.y, this._body2[indext].x-this._body1[indext].x, this._body1[indext].y-this._body2[indext].y);
 		

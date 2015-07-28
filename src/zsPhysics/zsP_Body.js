@@ -122,10 +122,15 @@ var zsP_Body = cc.Node.extend({
 	_maxG : null,//最大重力加速度防止穿越
 	
 	_node : null,//显示对象
-
+	
+	_nodeAnchor : null, //显示对象相对锚点
+	
+	_isOnGround : false,
 	ctor:function (bodyRect) {
 		
 		this._super();
+		
+		this._nodeAnchor =  cc.p(0.5, 0);
 		
 		this.setBodyRect(bodyRect);
 		
@@ -141,9 +146,9 @@ var zsP_Body = cc.Node.extend({
 	
 	setNodePos : function() {
 		if(this._node != null){
-			this._node.setPosition(this.getPosition());
+			this._node.setPosition( cc.pAdd(this.getPosition(), cc.p(this._bodyRect.width*this._nodeAnchor.x, this._bodyRect.height*this._nodeAnchor.y)));
 		}else{
-			cc.log("zsbody _node is null");
+//			cc.log("zsbody _node is null");
 		}
 		
 	},
@@ -536,5 +541,23 @@ var zsP_Body = cc.Node.extend({
 	isCollisionLadder : function() {
 		return this._isCollisionLadder;
 	},
+	
+	
+	setisOnGround : function(is) {
+		this._isOnGround = is;
+	},
+	
+	isOnGround : function() {
+		return this._isOnGround;
+	},
+	
+	setOnGround : function() {
+		this.setVy(0);
+		this.setAy(0);
+		this.clearDownEff_y();
+		this._isOnGround = true;
+	},
+
+	
 	
 });

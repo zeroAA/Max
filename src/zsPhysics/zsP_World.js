@@ -187,6 +187,7 @@ var zsP_World = cc.Node.extend({
 //			body.setOnLadder(false);
 			var isCollisionLadder = false;
 		
+			body.setisOnGround(false);
 			
 			for(var j = 0;j<this._rigidBodyArray.length;j++){
 				var body2 =this._rigidBodyArray[j];
@@ -199,8 +200,7 @@ var zsP_World = cc.Node.extend({
 						if(!body.isOnLadder()&& cc.rectGetMinY(body.getBefBodyRect())>=cc.rectGetMaxY(body2.getBefBodyRect())){
 							
 							body.y = cc.rectGetMaxY(body2.getBodyRect());
-							body.setVy(0);
-							body.setAy(0);
+							
 							
 							
 							if(body2.getBefPos().x != body2.x&&(body.getDir()!=zsP_Body_const.DIR_LEFT&&body.getDir()!=zsP_Body_const.DIR_RIGHT)){// 添加
@@ -218,7 +218,7 @@ var zsP_World = cc.Node.extend({
 
 							}
 							
-							body.clearDownEff_y();
+							body.setOnGround();
 							
 						}
 						
@@ -242,12 +242,13 @@ var zsP_World = cc.Node.extend({
 						
 						if(body2.getType() == zsP_Body_const.TYPE_RIGID_BODY_SLOPE_UP){
 							
+							
 							if(cc.rectGetMaxX( body.getBodyRect())>cc.rectGetMaxX(body2.getBodyRect())){
 								if(cc.rectGetMinX(body.getBefBodyRect())<cc.rectGetMaxX(body2.getBefBodyRect())){
 									body.y = cc.rectGetMaxY(body2.getBodyRect())
-									body.setVy(0);
-									body.setAy(0);
-									body.clearEff_y();
+									body.setOnGround();
+									
+									
 								}else{
 									if(body.y<cc.rectGetMaxY(body2.getBodyRect())){
 										body.x = cc.rectGetMaxX(body2.getBodyRect());
@@ -256,16 +257,23 @@ var zsP_World = cc.Node.extend({
 								}
 							}else{
 								var y = (cc.rectGetMaxX( body.getBodyRect())-cc.rectGetMinX(body2.getBodyRect()))*body2.getBodyRect().height/body2.getBodyRect().width;
+								
 								if(cc.rectGetMinY(body.getBodyRect())<(y+cc.rectGetMinY(body2.getBodyRect()))){
-
+									
 									body.y = y+cc.rectGetMinY(body2.getBodyRect());
-									body.setVy(0);
-									body.setAy(0);
-									body.clearEff_y();
+									body.setOnGround();
+									
+									if (this._G<20) {
+										body._Vy -=(20-this._G);
+									}
+									
+									
 									if(body2.getFriction()<1){
 										body.setEff_X_Time(1,-this._G*(1-body2.getFriction()),4);
 
 									}
+									
+									
 								}
 							}
 
@@ -274,9 +282,8 @@ var zsP_World = cc.Node.extend({
 							if(cc.rectGetMinX( body.getBodyRect())<cc.rectGetMinX(body2.getBodyRect())){
 								if(cc.rectGetMaxX(body.getBefBodyRect())>cc.rectGetMinX(body2.getBefBodyRect())){
 									body.y = cc.rectGetMaxY(body2.getBodyRect());
-									body.setVy(0);
-									body.setAy(0);
-									body.clearEff_y();
+									body.setOnGround();
+									
 								}else{
 									if(body.y<cc.rectGetMaxY(body2.getBodyRect())){
 										body.x = cc.rectGetMinX(body2.getBodyRect())-body.getBodyRect().width;
@@ -290,15 +297,16 @@ var zsP_World = cc.Node.extend({
 								if(cc.rectGetMinY(body.getBodyRect())<y+cc.rectGetMinY(body2.getBodyRect())){
 
 									body.y = y+cc.rectGetMinY(body2.getBodyRect());
-									body.setVy(0);
-									body.setAy(0);
-
+									body.setOnGround();
+									if (this._G<20) {
+										body._Vy -=(20-this._G);
+									}
+									
 									if(body2.getFriction()<1){
 										body.setEff_X_Time(1,this._G*(1-body2.getFriction()),5);
 
 									}
 									
-									body.clearEff_y();
 								}
 							}
 
@@ -309,8 +317,7 @@ var zsP_World = cc.Node.extend({
 							if(cc.rectGetMaxY(body2.getBefBodyRect())<=cc.rectGetMinY(body.getBefBodyRect())){// 从上往下
 								
 								body.y = cc.rectGetMaxY(body2.getBodyRect());
-								body.setVy(0);
-								body.setAy(0);
+								
 
 								if(body2.getBefPos().x != body2.x&&(body.getDir()!=zsP_Body_const.DIR_LEFT&&body.getDir()!=zsP_Body_const.DIR_RIGHT)){// 添加
 									// 移动平台
@@ -332,8 +339,8 @@ var zsP_World = cc.Node.extend({
 									body.setEff_X_Time(1, body2.getOutForce()*(body2.getFriction()),8);
 									
 								}
+								body.setOnGround();
 								
-								body.clearDownEff_y();
 							
 								continue;
 							}else if(cc.rectGetMinY(body2.getBefBodyRect())>=cc.rectGetMaxY(body.getBefBodyRect())){ // 从下往上

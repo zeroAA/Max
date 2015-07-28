@@ -9,11 +9,13 @@ var GameScene = cc.Scene.extend({
 
 var WORLD = null;
 
+var time = 0;
+
 var GameLayer = cc.Layer.extend({
 	
 	BG_Z:-50,
 	
-	PLAYER_Z:-10,
+	PLAYER_Z:110,
 	
 	_bg_layer:null,
 	
@@ -39,6 +41,10 @@ var GameLayer = cc.Layer.extend({
 		
 		this._super();
 		
+		this.addKey();
+
+		this.addTouches();
+		
 		this._drawNode = new cc.DrawNode();
 
 		this.addChild(this._drawNode, 110);
@@ -49,24 +55,30 @@ var GameLayer = cc.Layer.extend({
 		
 		this._map = new TiledMap(res.map1_tmx);
 
+//		this._map.getLayer("test").setVisible(false);
 //		this._map.getLayer("p").setVisible(false);
-
-
+		
 		this.addChild(this._map, -5);
+		
+		ccs.armatureDataManager.addArmatureFileInfo(res.player_1_csb);
+
+		this._player = new Player("player_1");
+		this._player.playWithIndex(0);
+		this.addChild(this._player, this.PLAYER_Z);
 		
 		WORLD = new zsP_World(cc.rect(0, 0, this._map.getMapSize().width*this._map.getTileSize().width, this._map.getMapSize().height*this._map.getTileSize().height));
 		WORLD.setG(5);
 		this.addChild(WORLD, 100);
 		
 		
-		this._playerBody = new zsP_Body(cc.rect(0, 0, 60, 80));
+		this._playerBody = new zsP_Body(cc.rect(0, 0, this._player.getBodyRect().width, 100));
 		
 //		this._playerBody.retain();
 		
 		this._playerBody.setType(zsP_Body_const.TYPE_NORMAL);
 		this._playerBody.setIsCanFall(true);
 		this._playerBody.setPosition(150, 500);
-
+		this._playerBody.setNode(this._player);
 		WORLD.addBody(this._playerBody);
 //		this._eye_start_pos = this._playerBody.getPosition();
 		this._eye_rect = new cc.rect(cc.winSize.width*0.5,cc.winSize.height*0.5, 0, cc.winSize.height*0.5);
@@ -83,15 +95,7 @@ var GameLayer = cc.Layer.extend({
 		
 		
 		
-		ccs.armatureDataManager.addArmatureFileInfo(res.player_1_csb);
 		
-		this._player = new Actor("player_1");
-		this._playerBody.setNode(this._player);
-		this.addChild(this._player, this.PLAYER_Z);
-		
-		this.addKey();
-		
-		this.addTouches();
 		
 //		var actor = new cc.Sprite(res.CloseNormal_png);
 //		actor.setPosition(400, 200);
@@ -179,10 +183,14 @@ var GameLayer = cc.Layer.extend({
 							if(self._playerBody.isOnLadder()){
 								self._playerBody.addVy(-self._PV);
 							}
+							
+							
 
 						}else if(keyStr == "a"){
 
 							self._playerBody.addVx(-self._PX);
+							self._player.playRun();
+							self._player.setDir(Player_const.DIR_RIGHT);
 						}else if(keyStr == "w"){
 
 							if(self._playerBody.isCollisionLadder()&&!self._playerBody.isOnLadder()){
@@ -198,10 +206,16 @@ var GameLayer = cc.Layer.extend({
 							}
 						}else if(keyStr == "d"){
 							self._playerBody.addVx(self._PX);
+							self._player.playRun();
+							self._player.setDir(Player_const.DIR_LEFT);
 						}else if(keyStr == "j"){
 
 						}else if(keyStr == "k"){
 							self._playerBody.setJump(50);
+							
+							self._player.playJump();
+
+							self._player.addJumpC();
 						}
 					}
 //					cc.log(strTemp);
@@ -224,6 +238,7 @@ var GameLayer = cc.Layer.extend({
 						}else if(keyStr == "a"){
 
 							self._playerBody.addVx(self._PX);
+							self._player.playStop(); 
 						}else if(keyStr == "w"){
 
 
@@ -235,6 +250,7 @@ var GameLayer = cc.Layer.extend({
 							}
 						}else if(keyStr == "d"){
 							self._playerBody.addVx(-self._PX);
+							self._player.playStop();
 						}else if(keyStr == "j"){
 
 						}else if(keyStr == "k"){
@@ -278,7 +294,7 @@ var GameLayer = cc.Layer.extend({
 	update:function (dt) {
 		// chipmunk step
 		
-		
+		time++;
 		
 //		var array = this._map.getRectsAt(cc.rect(this._playerBody.getBodyRect().x-this._map.getTileSize().width) , "p",1,"type");
 		
@@ -309,6 +325,17 @@ var GameLayer = cc.Layer.extend({
 		WORLD.cycle(dt);
 		
 		this.setEyePos();
+		
+		if (!this._playerBody.isOnGround()&&this._playerBody.getVy()<0) {
+			
+			this._player.playFall();
+		}
+		
+		if (this._playerBody.isOnGround()&&(this._player.getState() == Player_const.STATE_FALL||this._player.getState() == Player_const.STATE_JUMP)) {
+			this._player.playStay();
+		}
+		
+		this._player.cycle(dt);
 
 	},
 	

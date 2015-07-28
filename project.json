@@ -12,9 +12,6 @@
   "jsList": [
     "src/resource.js",
     "src/app.js",
-    "src/Back.js",
-    "src/Common.js",
-    "src/Game.js",
     "src/zsPhysics/zsP_World.js",
     "src/zsPhysics/zsP_Body.js",
     "src/zsEngine/Actor.js",
@@ -22,6 +19,11 @@
     "src/zsEngine/Tools.js",
     "src/zsEngine/Sprite.js",
     "src/zsEngine/SpriteManage.js",
-    "src/zsEngine/TiledMap.js"
+    "src/zsEngine/TiledMap.js",
+    "src/Back.js",
+    "src/Common.js",
+    "src/Player/Player.js",
+    "src/Game.js"
+    
   ]
 }
