@@ -13,6 +13,8 @@ var zsP_Body_const = {
 		TYPE_RIGID_BODY_DRIVE : 4,
 
 		TYPE_RIGID_BODY_LADDER : 5,
+		
+		TYPE_RIGID_BODY_ROOF : 6,
 
 	    DIR_STAY : 0,
 
@@ -35,6 +37,13 @@ var zsP_Body_const = {
 	   	STATE_BACK : 102,
 	   	
 	   	LIFE_TIME_LIMIT : -10,
+	   	
+	   	ON_GROUND_NO : 0,
+	   	
+	   	ON_GROUND_RIGID : 1,
+	   	
+	   	ON_GROUND_ROOF : 2,
+
 	   
 };
 
@@ -125,7 +134,7 @@ var zsP_Body = cc.Node.extend({
 	
 	_nodeAnchor : null, //显示对象相对锚点
 	
-	_isOnGround : false,
+	_onGroundType : 0,
 	ctor:function (bodyRect) {
 		
 		this._super();
@@ -543,19 +552,25 @@ var zsP_Body = cc.Node.extend({
 	},
 	
 	
-	setisOnGround : function(is) {
-		this._isOnGround = is;
+	setNOOnGround : function() {
+		
+		this._isOnGround = zsP_Body_const.ON_GROUND_NO;
+		
 	},
 	
-	isOnGround : function() {
+	getOnGround : function() {
 		return this._isOnGround;
 	},
 	
-	setOnGround : function() {
+	isOnGround : function() {
+		return this._isOnGround!=zsP_Body_const.ON_GROUND_NO;
+	},
+	
+	setOnGround : function(ontype) {
 		this.setVy(0);
 		this.setAy(0);
 		this.clearDownEff_y();
-		this._isOnGround = true;
+		this._isOnGround = ontype;
 	},
 
 	

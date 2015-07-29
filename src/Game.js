@@ -37,6 +37,16 @@ var GameLayer = cc.Layer.extend({
 	
 	_PX : 10,
 	
+	BUTTON_W  : false,
+	BUTTON_A  : false,
+	BUTTON_S  : false,
+	BUTTON_D  : false,
+	
+	BUTTON_J  : false,
+	BUTTON_K  : false,
+	
+//	_button : [false,false,false,false,false,false], 
+	
 	ctor:function () {
 		
 		this._super();
@@ -182,17 +192,22 @@ var GameLayer = cc.Layer.extend({
 
 							if(self._playerBody.isOnLadder()){
 								self._playerBody.addVy(-self._PV);
+							}else{
+								self.BUTTON_S = true;
+								
 							}
 							
 							
 
 						}else if(keyStr == "a"){
+							
+							self.BUTTON_A = true;
 
-							self._playerBody.addVx(-self._PX);
-							self._player.playRun();
-							self._player.setDir(Player_const.DIR_RIGHT);
+//							self._playerBody.addVx(-self._PX);
+//							self._player.playRun();
+//							self._player.setDir(Player_const.DIR_RIGHT);
 						}else if(keyStr == "w"){
-
+							
 							if(self._playerBody.isCollisionLadder()&&!self._playerBody.isOnLadder()){
 
 								self._playerBody.setOnLadder(true);
@@ -205,17 +220,27 @@ var GameLayer = cc.Layer.extend({
 								self._playerBody.addVy(self._PV);
 							}
 						}else if(keyStr == "d"){
-							self._playerBody.addVx(self._PX);
-							self._player.playRun();
-							self._player.setDir(Player_const.DIR_LEFT);
+							
+							self.BUTTON_D = true;
+							
+//							self._playerBody.addVx(self._PX);
+//							self._player.playRun();
+//							self._player.setDir(Player_const.DIR_LEFT);
 						}else if(keyStr == "j"){
 
 						}else if(keyStr == "k"){
-							self._playerBody.setJump(50);
-							
-							self._player.playJump();
+							if (self._playerBody.getOnGround() == zsP_Body_const.ON_GROUND_ROOF&&self._player.getState()==Player_const.STATE_DOWN) {
+								self._playerBody.y-=self._PV;
+							}else{
+								self._playerBody.setJump(50);
 
-							self._player.addJumpC();
+								self._player.playJump();
+
+								self._player.addJumpC();
+							}
+							
+							
+							
 						}
 					}
 //					cc.log(strTemp);
@@ -233,11 +258,16 @@ var GameLayer = cc.Layer.extend({
 								if(self._playerBody.getVy()<0){
 									self._playerBody.addVy(self._PV);
 								}
+							}else{
+								self.BUTTON_S = false;
+								if(self._player.getState()==Player_const.STATE_DOWN){
+									self._player.playStay();
+								}
 							}
 
 						}else if(keyStr == "a"){
-
-							self._playerBody.addVx(self._PX);
+							self.BUTTON_A = false;
+							self._playerBody.setVx(0);
 							self._player.playStop(); 
 						}else if(keyStr == "w"){
 
@@ -249,6 +279,7 @@ var GameLayer = cc.Layer.extend({
 								}
 							}
 						}else if(keyStr == "d"){
+							self.BUTTON_D = false;
 							self._playerBody.addVx(-self._PX);
 							self._player.playStop();
 						}else if(keyStr == "j"){
@@ -289,6 +320,32 @@ var GameLayer = cc.Layer.extend({
 		cc.log("Key flags changed:" + key);
 	},
 	
+	keyControl : function(dt) {
+		
+		if (this.BUTTON_A) {
+			this._playerBody.setVx(-this._PX);
+			this._player.playRun();
+			if (this._player.getDir() != Player_const.DIR_RIGHT) {
+				this._player.setDir(Player_const.DIR_RIGHT);
+			}
+		}else
+		
+		if (this.BUTTON_D) {
+			this._playerBody.setVx(this._PX);
+			this._player.playRun();
+			if (this._player.getDir() != Player_const.DIR_LEFT) {
+				this._player.setDir(Player_const.DIR_LEFT);
+			}
+		}else
+		
+		if (this.BUTTON_S) {
+			if (this._playerBody.isOnGround()) {
+				this._player.playDown();
+			}
+		}
+		
+	},
+	
 	
 	
 	update:function (dt) {
@@ -297,6 +354,8 @@ var GameLayer = cc.Layer.extend({
 		time++;
 		
 //		var array = this._map.getRectsAt(cc.rect(this._playerBody.getBodyRect().x-this._map.getTileSize().width) , "p",1,"type");
+		
+		this.keyControl(dt);
 		
 		WORLD.initCycle(dt);
 		

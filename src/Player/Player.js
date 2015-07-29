@@ -7,6 +7,7 @@ var Player_const = {
 		STATE_FALL : 5,
 		STATE_RUN : 9,
 		STATE_STOP : 10,
+		STATE_DOWN : 11,
 		
 		ANIM_STAY : 0,
 		ANIM_ATK1 : 1,
@@ -47,6 +48,12 @@ var Player = Actor.extend({
 				this._state = Player_const.STATE_STAY;
 			}
 		}
+		
+//		this.debugDraw();
+	},
+	
+	getDir : function() {
+		return this._dir;
 	},
 	
 	setDir :function(dir){
@@ -104,10 +111,28 @@ var Player = Actor.extend({
 	},
 	
 	playRun : function() {
-		if (this._state == Player_const.STATE_STAY||this._state == Player_const.STATE_STOP) {
+		if (this._state == Player_const.STATE_STAY||this._state == Player_const.STATE_STOP||this._state == Player_const.STATE_DOWN) {
 			this.playWithIndex(Player_const.ANIM_RUN);
 			this._state = Player_const.STATE_RUN;
 		}
 		
+	},
+	
+	playAtk : function() {
+		if (this._state == Player_const.STATE_A) {
+			
+		}
+	},
+	
+	playDown : function() {
+		
+		
+		if (this._state != Player_const.STATE_JUMP && this._state != Player_const.STATE_DOWN) {
+			
+			this.playWithIndex(Player_const.ANIM_DOWN);
+			
+			this._state = Player_const.STATE_DOWN;
+			
+		}
 	},
 });

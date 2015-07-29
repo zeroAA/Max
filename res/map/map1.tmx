@@ -25,6 +25,11 @@
     <property name="type" value="5"/>
    </properties>
   </tile>
+  <tile id="4">
+   <properties>
+    <property name="type" value="6"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="test" width="100" height="100">
   <data encoding="base64" compression="zlib">
@@ -33,7 +38,7 @@
  </layer>
  <layer name="p" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eJzt12GKgzAQBlCv1G7vf7b9VRB3jYkanYnvQaAgQjKfdcZpAp7uNVvE8iosYpERAGtK/VzfAABoVztfmbUAAOqZsQDYa08P0UsAID69OhYzFgDko28DABxjlgIA6MesBQDj0d8BAPoybwFwFr0kBrUHMvPuisW3IpCV9xeQlfcXjOE9/f0P/9y6o+f6LwuZ3KOUxTePkTKJ3M+3shg1k4hqs5BJf61ZyKSfvVmMkkmk/nEkhwj7v1rvc8qjTbRzfmbriaI9e/KQRyTy6K+lH8ojltHzyDa7be3n6BnW7v0s1tk1yzpP9/4eWLtnmUfNvlpkz2P+e4Q8spLHdVprK4/rySOWPX0u+6o5+/J6qW41Na11d23ksX3v6Kvm7Mvrpbr1rukvHWWW3w==
+   eJzt12FugzAMBtBeqVt3/6vtVyXECjiQMBvekyJVQlTgD2LzeAB395wscnmuLHKREQBL1vq5vgEA0C46X5m1AADizFgA7LWnh+glAJCfXp2LGQsA6tG3AQCOMUsBAIxj1gKA69HfAQDGMm8B0ItekoPaA5XZu7b9LKwRfCsCVdm/yG6pn5/R3++kYk3tX3ANX4+/7/B3p//WQ9p8yqJ3JsSsZfHO41MmVZ/xzP18K4utTOgnmoVMxmvNokcm0Z5eae/rYW8WV3lPMvWPIzlkuP6zjb7PnnncYX/J9ty9JuuOsu0FI/Ko1M/vkEcllfLI+DxHtMwnlfI4KvM+9Xb1PKrN0lvXc/Qels59zVbvmlX9vhn9fbZ0zjyPyHW1qJ7H9HfWPDLv+71UyqO61trK43zyyGVPn6u+Ivc+P75Wt0hNo/67NvLYPvfqK3Lv8+NrdRtd01+SgqgO
   </data>
  </layer>
 </map>

@@ -23,7 +23,10 @@ var Actor = ccs.Armature.extend({
 //		this.setBodyPonit();
 		this.playWithIndex(0);
 		if(DEBUG_DRAW){
-			this.debugDraw();
+			this._darwNode = new cc.DrawNode();
+
+			this.addChild(this._darwNode, 100);
+			
 		}
 		
 		
@@ -110,22 +113,16 @@ var Actor = ccs.Armature.extend({
 	},
 	
 	debugDraw:function(){
-//		if(this.){
-//			
-//		}
-//		this.removeChild(this.darwNode, true);
-		this._darwNode = new cc.Node();
 		
-		this.addChild(this._darwNode, 100);
-		
+		this._darwNode.clear();
 		for(var i = 0 ; i < this._body1.length ; ++i){
-			var darw = new cc.DrawNode();
 			
-			darw.drawRect(cc.p(this.getBodyRect().x, this.getBodyRect().y), cc.p(this.getBodyRect().x+this.getBodyRect().width, this.getBodyRect().y+this.getBodyRect().height), cc.color(255, 0, 0, 180), 2, cc.color(0, 0, 0, 180));
 			
-			darw.drawCircle(cc.p(this.getBodyRect().x, this.getBodyRect().y), 10, 360, 10, true, 5, cc.color(255, 255, 255, 100));
+			this._darwNode.drawRect(cc.p(this.getBodyRect().x, this.getBodyRect().y), cc.p(this.getBodyRect().x+this.getBodyRect().width, this.getBodyRect().y+this.getBodyRect().height), cc.color(255, 0, 0, 180), 2, cc.color(0, 0, 0, 180));
 			
-			this._darwNode.addChild(darw);
+			this._darwNode.drawCircle(cc.p(this.getBodyRect().x, this.getBodyRect().y), 10, 360, 10, true, 5, cc.color(255, 255, 255, 100));
+			
+			
 			
 			
 		}

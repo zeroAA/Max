@@ -99,12 +99,12 @@ var zsP_World = cc.Node.extend({
 		
 //		this._rigidBodyArray.push(body);
 		
-		var body = new zsP_Body(cc.rect(0, 0, 600, 200));
-		body.setType(zsP_Body_const.TYPE_RIGID_BODY);
+		var body = new zsP_Body(cc.rect(0, 0, 200, 50));
+		body.setType(zsP_Body_const.TYPE_RIGID_BODY_ROOF);
 		body.retain();
-		body.setFriction(1);
-		body.setOutForce(5);
-		body.setPosition(200, 100);
+//		body.setFriction(1);
+//		body.setOutForce(5);
+		body.setPosition(200, 500);
 //		this._rigidBodyArray.push(body);
 		
 		return true;
@@ -187,7 +187,7 @@ var zsP_World = cc.Node.extend({
 //			body.setOnLadder(false);
 			var isCollisionLadder = false;
 		
-			body.setisOnGround(false);
+			body.setNOOnGround();
 			
 			for(var j = 0;j<this._rigidBodyArray.length;j++){
 				var body2 =this._rigidBodyArray[j];
@@ -218,7 +218,7 @@ var zsP_World = cc.Node.extend({
 
 							}
 							
-							body.setOnGround();
+							body.setOnGround(zsP_Body_const.ON_GROUND_RIGID);
 							
 						}
 						
@@ -246,7 +246,7 @@ var zsP_World = cc.Node.extend({
 							if(cc.rectGetMaxX( body.getBodyRect())>cc.rectGetMaxX(body2.getBodyRect())){
 								if(cc.rectGetMinX(body.getBefBodyRect())<cc.rectGetMaxX(body2.getBefBodyRect())){
 									body.y = cc.rectGetMaxY(body2.getBodyRect())
-									body.setOnGround();
+									body.setOnGround(zsP_Body_const.ON_GROUND_RIGID);
 									
 									
 								}else{
@@ -261,7 +261,7 @@ var zsP_World = cc.Node.extend({
 								if(cc.rectGetMinY(body.getBodyRect())<(y+cc.rectGetMinY(body2.getBodyRect()))){
 									
 									body.y = y+cc.rectGetMinY(body2.getBodyRect());
-									body.setOnGround();
+									body.setOnGround(zsP_Body_const.ON_GROUND_RIGID);
 									
 									if (this._G<20) {
 										body._Vy -=(20-this._G);
@@ -282,7 +282,7 @@ var zsP_World = cc.Node.extend({
 							if(cc.rectGetMinX( body.getBodyRect())<cc.rectGetMinX(body2.getBodyRect())){
 								if(cc.rectGetMaxX(body.getBefBodyRect())>cc.rectGetMinX(body2.getBefBodyRect())){
 									body.y = cc.rectGetMaxY(body2.getBodyRect());
-									body.setOnGround();
+									body.setOnGround(zsP_Body_const.ON_GROUND_RIGID);
 									
 								}else{
 									if(body.y<cc.rectGetMaxY(body2.getBodyRect())){
@@ -297,7 +297,7 @@ var zsP_World = cc.Node.extend({
 								if(cc.rectGetMinY(body.getBodyRect())<y+cc.rectGetMinY(body2.getBodyRect())){
 
 									body.y = y+cc.rectGetMinY(body2.getBodyRect());
-									body.setOnGround();
+									body.setOnGround(zsP_Body_const.ON_GROUND_RIGID);
 									if (this._G<20) {
 										body._Vy -=(20-this._G);
 									}
@@ -339,46 +339,52 @@ var zsP_World = cc.Node.extend({
 									body.setEff_X_Time(1, body2.getOutForce()*(body2.getFriction()),8);
 									
 								}
-								body.setOnGround();
+								if(body2.getType() == zsP_Body_const.TYPE_RIGID_BODY_ROOF){	
+									body.setOnGround(zsP_Body_const.ON_GROUND_ROOF);
+								}else{
+									body.setOnGround(zsP_Body_const.ON_GROUND_RIGID);
+								}
+								
 								
 							
 								continue;
-							}else if(cc.rectGetMinY(body2.getBefBodyRect())>=cc.rectGetMaxY(body.getBefBodyRect())){ // 从下往上
+							} 
+								
+							if(body2.getType() != zsP_Body_const.TYPE_RIGID_BODY_ROOF){	
+								if(cc.rectGetMinY(body2.getBefBodyRect())>=cc.rectGetMaxY(body.getBefBodyRect())){ // 从下往上
+									
+									body.y = cc.rectGetMinY(body2.getBodyRect())-body.getBodyRect().height;
+									body.setVy(0);
+									body.setAy(0);
+									body.clearUpEff_y();
+									continue;
+								}
+	
+	
+								// /////////
+	
+								// 判断左右
+	
+								// if(body.getDir() == zsP_Body_const.DIR_RIGHT){//向右移动
+								//						
+								// }else if(body.getDir() == zsP_Body_const.DIR_LEFT){//向左移动
+								//						
+								// }
 								
 								
 								
-								body.y = cc.rectGetMinY(body2.getBodyRect())-body.getBodyRect().height;
-								body.setVy(0);
-								body.setAy(0);
-								body.clearUpEff_y();
-								continue;
+								if(cc.rectGetMinX(body2.getBefBodyRect())>=cc.rectGetMaxX(body.getBefBodyRect())){
+									
+									body.x = cc.rectGetMinX(body2.getBodyRect())-body.getBodyRect().width-1;
+									body.clearEff_x();
+									continue;
+								}else if(cc.rectGetMaxX(body2.getBefBodyRect())<=cc.rectGetMinX(body.getBefBodyRect())){
+									
+									body.x = cc.rectGetMaxX(body2.getBodyRect())+1;
+									body.clearEff_x();
+									continue;
+								}
 							}
-
-
-							// /////////
-
-							// 判断左右
-
-							// if(body.getDir() == zsP_Body_const.DIR_RIGHT){//向右移动
-							//						
-							// }else if(body.getDir() == zsP_Body_const.DIR_LEFT){//向左移动
-							//						
-							// }
-							
-							
-							
-							if(cc.rectGetMinX(body2.getBefBodyRect())>=cc.rectGetMaxX(body.getBefBodyRect())){
-								
-								body.x = cc.rectGetMinX(body2.getBodyRect())-body.getBodyRect().width-1;
-								body.clearEff_x();
-								continue;
-							}else if(cc.rectGetMaxX(body2.getBefBodyRect())<=cc.rectGetMinX(body.getBefBodyRect())){
-								
-								body.x = cc.rectGetMaxX(body2.getBodyRect())+1;
-								body.clearEff_x();
-								continue;
-							}
-
 							// /////////
 						}
 					}
@@ -461,6 +467,9 @@ var zsP_World = cc.Node.extend({
 				this._drawNode.drawSegment(cc.p(body.getBodyRect().x, body.getBodyRect().y+body.getBodyRect().height), cc.p(body.getBodyRect().x+body.getBodyRect().width, body.getBodyRect().y),2, cc.color(0, 255, 255, 100))
 			}else if(body.getType() == zsP_Body_const.TYPE_RIGID_BODY_LADDER){
 				this._drawNode.drawRect(cc.p(body.getBodyRect().x, body.getBodyRect().y), cc.p(body.getBodyRect().x+body.getBodyRect().width, body.getBodyRect().y+body.getBodyRect().height), cc.color(255, 255, 0, 100), 2, cc.color(0, 0, 0, 100));
+
+			}else if(body.getType() == zsP_Body_const.TYPE_RIGID_BODY_ROOF){
+				this._drawNode.drawRect(cc.p(body.getBodyRect().x, body.getBodyRect().y), cc.p(body.getBodyRect().x+body.getBodyRect().width, body.getBodyRect().y+body.getBodyRect().height), cc.color(255, 100, 0, 100), 2, cc.color(0, 0, 0, 100));
 
 			}else{
 				this._drawNode.drawRect(cc.p(body.getBodyRect().x, body.getBodyRect().y), cc.p(body.getBodyRect().x+body.getBodyRect().width, body.getBodyRect().y+body.getBodyRect().height), cc.color(255, 0, 0, 100), 2, cc.color(0, 0, 0, 100));
