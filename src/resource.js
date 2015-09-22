@@ -6,13 +6,16 @@ var res = {
     
     player_1_csb : "res/player/player_1.csb",
     
-    map1_tmx : "res/map/map1.tmx",
-    	map1_png : "res/map/map1.png",
+    weapon_1_csb : "res/weapon/weapon_1.csb",
+    
+    map1_tmx : "res/map/map_1.tmx",
+    	map1_png : "res/map/map_1.png",
 };
 
 var game_res = [
 	res.BG_1_png,
 	res.player_1_csb,
+	res.weapon_1_csb,
 	res.map1_tmx,
 	res.map1_png,
 ];

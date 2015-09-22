@@ -3,26 +3,19 @@ var Player_const = {
 		DIR_RIGHT : 1,
 		
 		STATE_STAY : 0,
-		STATE_JUMP : 4,
-		STATE_FALL : 5,
-		STATE_RUN : 9,
-		STATE_STOP : 10,
-		STATE_DOWN : 11,
+		STATE_ATK : 1,
+		STATE_SKILL : 1,
+		STATE_JUMP : 3,
+		STATE_FALL : 4,
+		STATE_RUN : 5,
 		
 		ANIM_STAY : 0,
-		ANIM_ATK1 : 1,
-		ANIM_ATK2 : 2,
-		ANIM_ATK3 : 3,
-		ANIM_JUMP1 : 4,
-		ANIM_JUMP2 : 5,
-		ANIM_JUMP3 : 6,
-		ANIM_JUMP4 : 7,
-		ANIM_BACK : 8,
-		ANIM_RUN : 9,
-		ANIM_STOP : 10,
-		ANIM_DOWN : 11,
-		ANIM_HITBACK : 12,
-		ANIM_HIT : 13,
+		ANIM_ATK : 1,
+		ANIM_SKILL : 2,
+		ANIM_JUMP_UP : 3,
+		ANIM_JUMP_DOWN : 4,
+		ANIM_RUN :5,
+
 };
 
 
@@ -34,18 +27,19 @@ var Player = Actor.extend({
 	
 	_state : Player_const.STATE_STAY,
 	
+	
 	ctor:function (name) {
 		this._super(name);
 		this._dir = Player_const.DIR_LEFT;
-		return;
+		
+		return true;
 	},
 	
 	
 	cycle : function(dt) {
-		if (this._state == Player_const.STATE_STOP) {
+		if (this._state == Player_const.STATE_ATK) {
 			if (this.getAnimation().getCurrentMovementID()=="") {
-				this.playWithIndex(Player_const.ANIM_STAY);
-				this._state = Player_const.STATE_STAY;
+				this.playStay();
 			}
 		}
 		
@@ -81,17 +75,17 @@ var Player = Actor.extend({
 	playJump : function() {
 		this._state = Player_const.STATE_JUMP;
 		
-		if (this._jumpC==0) {
-			this.playWithIndex(Player_const.ANIM_JUMP1);
-		}else{
-			this.playWithIndex(Player_const.ANIM_JUMP4);
-		}
+		this.playWithIndex(Player_const.ANIM_JUMP_UP);
+		
 	},
 	
 	playFall : function() {
-		this._state = Player_const.STATE_FALL;
+		if (this._state != Player_const.STATE_ATK) {
+			this._state = Player_const.STATE_FALL;
+
+			this.playWithIndex(Player_const.ANIM_JUMP_DOWN);
+		}
 		
-		this.playWithIndex(Player_const.ANIM_JUMP3);
 	},
 	
 	playStay : function() {
@@ -99,19 +93,12 @@ var Player = Actor.extend({
 		
 		this.playWithIndex(Player_const.ANIM_STAY);
 		
-		this.clearJumpC();
-	},
-	
-	playStop : function() {
-		if (this._state == Player_const.STATE_RUN) {
-			this.playWithIndex(Player_const.ANIM_STOP);
-			this._state = Player_const.STATE_STOP;
-		}
 		
 	},
 	
+	
 	playRun : function() {
-		if (this._state == Player_const.STATE_STAY||this._state == Player_const.STATE_STOP||this._state == Player_const.STATE_DOWN) {
+		if (this._state == Player_const.STATE_STAY) {
 			this.playWithIndex(Player_const.ANIM_RUN);
 			this._state = Player_const.STATE_RUN;
 		}
@@ -119,20 +106,31 @@ var Player = Actor.extend({
 	},
 	
 	playAtk : function() {
-		if (this._state == Player_const.STATE_A) {
+		if (this._state != Player_const.STATE_ATK) {
+			
+			this.playWithIndex(Player_const.ANIM_ATK);
+
+			this._state = Player_const.STATE_ATK;
 			
 		}
+		
+		
 	},
 	
-	playDown : function() {
+	
+	isCanRun : function() {
 		
 		
-		if (this._state != Player_const.STATE_JUMP && this._state != Player_const.STATE_DOWN) {
-			
-			this.playWithIndex(Player_const.ANIM_DOWN);
-			
-			this._state = Player_const.STATE_DOWN;
-			
-		}
+		
+		return this._state != Player_const.STATE_ATK;
+	},
+	
+	isCanChangeDir : function() {
+		return this._state != Player_const.STATE_ATK;
+	},
+	
+	isCanJump : function() {
+//		return this._state != Player_const.STATE_ATK;
+		return this._jumpC<2;
 	},
 });

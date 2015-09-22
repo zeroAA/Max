@@ -35,7 +35,7 @@ var GameLayer = cc.Layer.extend({
 	
 	_PV : 10,
 	
-	_PX : 10,
+	_PX : 6,
 	
 	BUTTON_W  : false,
 	BUTTON_A  : false,
@@ -64,24 +64,26 @@ var GameLayer = cc.Layer.extend({
 		this._eye_offset = new cc.p(0, 0);
 		
 		this._map = new TiledMap(res.map1_tmx);
-
+//		this._map.setScale(2);
 //		this._map.getLayer("test").setVisible(false);
-//		this._map.getLayer("p").setVisible(false);
+		this._map.getLayer("p").setVisible(false);
 		
 		this.addChild(this._map, -5);
 		
 		ccs.armatureDataManager.addArmatureFileInfo(res.player_1_csb);
+		
 
 		this._player = new Player("player_1");
+		this._player.setScale(2);
 		this._player.playWithIndex(0);
 		this.addChild(this._player, this.PLAYER_Z);
 		
 		WORLD = new zsP_World(cc.rect(0, 0, this._map.getMapSize().width*this._map.getTileSize().width, this._map.getMapSize().height*this._map.getTileSize().height));
-		WORLD.setG(5);
+		WORLD.setG(2);
 		this.addChild(WORLD, 100);
 		
 		
-		this._playerBody = new zsP_Body(cc.rect(0, 0, this._player.getBodyRect().width, 100));
+		this._playerBody = new zsP_Body(cc.rect(0, 0, this._player.getBodyRect().width, this._player.getBodyRect().height));
 		
 //		this._playerBody.retain();
 		
@@ -227,19 +229,21 @@ var GameLayer = cc.Layer.extend({
 //							self._player.playRun();
 //							self._player.setDir(Player_const.DIR_LEFT);
 						}else if(keyStr == "j"){
-
-						}else if(keyStr == "k"){
-							if (self._playerBody.getOnGround() == zsP_Body_const.ON_GROUND_ROOF&&self._player.getState()==Player_const.STATE_DOWN) {
-								self._playerBody.y-=self._PV;
-							}else{
-								self._playerBody.setJump(50);
-
-								self._player.playJump();
-
-								self._player.addJumpC();
+							self._player.playAtk();
+							if(self._playerBody.isOnGround()){
+								
+								self._playerBody.setVx(0);
 							}
 							
-							
+						}else if(keyStr == "k"){
+								
+								if (self._player.isCanJump()) {
+									self._playerBody.setJump(20);
+
+									self._player.playJump();
+
+									self._player.addJumpC();
+								}
 							
 						}
 					}
@@ -268,7 +272,7 @@ var GameLayer = cc.Layer.extend({
 						}else if(keyStr == "a"){
 							self.BUTTON_A = false;
 							self._playerBody.setVx(0);
-							self._player.playStop(); 
+							self._player.playStay(); 
 						}else if(keyStr == "w"){
 
 
@@ -280,8 +284,8 @@ var GameLayer = cc.Layer.extend({
 							}
 						}else if(keyStr == "d"){
 							self.BUTTON_D = false;
-							self._playerBody.addVx(-self._PX);
-							self._player.playStop();
+							self._playerBody.setVx(0);
+							self._player.playStay();
 						}else if(keyStr == "j"){
 
 						}else if(keyStr == "k"){
@@ -323,24 +327,35 @@ var GameLayer = cc.Layer.extend({
 	keyControl : function(dt) {
 		
 		if (this.BUTTON_A) {
-			this._playerBody.setVx(-this._PX);
-			this._player.playRun();
-			if (this._player.getDir() != Player_const.DIR_RIGHT) {
-				this._player.setDir(Player_const.DIR_RIGHT);
+			if (this._player.isCanRun()) {
+				
+				this._playerBody.setVx(-this._PX);
+				this._player.playRun();
+				
 			}
+			if(this._player.isCanChangeDir()){
+				if (this._player.getDir() != Player_const.DIR_RIGHT) {
+					this._player.setDir(Player_const.DIR_RIGHT);
+				}
+			}
+			
 		}else
 		
 		if (this.BUTTON_D) {
-			this._playerBody.setVx(this._PX);
-			this._player.playRun();
-			if (this._player.getDir() != Player_const.DIR_LEFT) {
-				this._player.setDir(Player_const.DIR_LEFT);
+			if (this._player.isCanRun()) {
+				this._playerBody.setVx(this._PX);
+				this._player.playRun();
+			}
+			if(this._player.isCanChangeDir()){
+				if (this._player.getDir() != Player_const.DIR_LEFT) {
+					this._player.setDir(Player_const.DIR_LEFT);
+				}
 			}
 		}else
 		
 		if (this.BUTTON_S) {
-			if (this._playerBody.isOnGround()) {
-				this._player.playDown();
+			if (this._playerBody.getOnGround() == zsP_Body_const.ON_GROUND_ROOF) {
+				this._playerBody.y-=this._PV;
 			}
 		}
 		
@@ -359,8 +374,23 @@ var GameLayer = cc.Layer.extend({
 		
 		WORLD.initCycle(dt);
 		
+		
+		
 		var add = 0;
 		var rect = cc.rect(this._playerBody.getBodyRect().x-add, this._playerBody.getBodyRect().y-add, this._playerBody.getBodyRect().width+add*2, this._playerBody.getBodyRect().height+add*2);
+		
+		var all1 = this._map.getIDRectsAt(rect, "up")
+		var type1 = all1[1];
+		if(type1.length==0){
+			
+//			this._map.getLayer("up").runAction(cc.fadeOut(0.2));
+			
+			this._map.getLayer("up").setVisible(true);
+		}else{
+//			this._map.getLayer("up").runAction(cc.fadeIn(0.2));
+			this._map.getLayer("up").setVisible(false);
+		}
+		
 		
 		var all = this._map.getRectsAt(rect, "p","type");
 		
@@ -394,7 +424,12 @@ var GameLayer = cc.Layer.extend({
 			this._player.playStay();
 		}
 		
+		if (this._playerBody.isOnGround()){
+			this._player.clearJumpC();
+		}
+		
 		this._player.cycle(dt);
+		
 
 	},
 	

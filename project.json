@@ -23,6 +23,7 @@
     "src/Back.js",
     "src/Common.js",
     "src/Player/Player.js",
+    "src/Player/Weapon.js",
     "src/Game.js"
     
   ]

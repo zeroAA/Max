@@ -93,7 +93,8 @@ var Actor = ccs.Armature.extend({
 		if(indext>=this._body1.length){
 			cc.log(this.getName() +" getBodyRect indext is over!");
 		}
-		var rect = cc.rect(this._body1[indext].x+this.x, this._body2[indext].y+this.y, this._body2[indext].x-this._body1[indext].x, this._body1[indext].y-this._body2[indext].y);
+	
+		var rect = cc.rect((this._body1[indext].x)*this.getScaleX()+this.x, (this._body2[indext].y)*this.getScaleY()+this.y, (this._body2[indext].x-this._body1[indext].x)*this.getScaleX(), (this._body1[indext].y-this._body2[indext].y)*this.getScaleY());
 		
 		return rect;
 	},
@@ -108,6 +109,7 @@ var Actor = ccs.Armature.extend({
 	},
 	
 	playWithIndex:function(indext){
+		
 		this.getAnimation().playWithIndex(indext);
 		this.setBodyPonit();
 	},
